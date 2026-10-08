@@ -1,5 +1,5 @@
 /* ============ casting: a portrait set for each person ============ */
-import { pick, toast } from './util.js';
+import { normName, pick, toast } from './util.js';
 import { EMOS, normGender } from './data.js';
 import { platform } from './db.js';
 import { app } from './app.js';
@@ -8,10 +8,6 @@ import { T } from './i18n.js';
 import { LIMITS } from './limits.js';
 import { charSets, charSetsAll, fitsWorld, genderOf, imagesVer, pickEmotion } from './images.js';
 
-const normName = x =>
-  String(x || '')
-    .replace(/\s+/g, '')
-    .toLowerCase();
 function namedSetFor(name) {
   const n = normName(name);
   if (!n) return null;

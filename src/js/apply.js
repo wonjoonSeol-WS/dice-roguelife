@@ -1,12 +1,12 @@
 /* ============ applying a reply ============ */
-import { cutLine, MARK_RE, pick } from './util.js';
-import { currencyOf, moneyText, normEmo, REALMS, STAT_LABEL, SUB_STATS, tierRank, TIERS } from './data.js';
+import { cutLine, MARK_RE, normName, pick } from './util.js';
+import { currencyOf, moneyText, moneyUnit, normEmo, REALMS, STAT_LABEL, SUB_STATS, tierRank, TIERS } from './data.js';
 import { ART_SLOT_LABEL, ART_SLOTS, artsToEnums, SKILL_SRC } from './enums.js';
-import { T, tIn } from './i18n.js';
+import { T, tIn, uiLang } from './i18n.js';
 import { LIMITS } from './limits.js';
 import { addDaysISO, clockMin, fmtKDate, parseKDate } from './calendar.js';
 import { app } from './app.js';
-import { storyLang } from './settings.js';
+import { promptLang, storyLang } from './settings.js';
 import { costPct, growthLevel, sameQuest, TITLES_MAX, titlesOn } from './rules.js';
 import { markSeen, renamePerson } from './people.js';
 import { bgKey, imgById, pickEmotion } from './images.js';
@@ -17,11 +17,11 @@ import { aiWillPick, castFor, presentOf, setTier, shadowFor, speakerOf, startAiP
 // them write what the player should see into the shared result: deltas (the number chips), notes (system lines) and
 // img (the scene and the people on screen). The steps run in this order; later ones may read what earlier ones did.
 const APPLY_STEPS = [
+  applyMoneyUnit, // first, so this reply's money moves count in the new unit
   applyWindfall,
   applyMainStats,
   applySubStats,
   applyEnergy,
-  applyMoneyUnit,
   clampStats,
   applyTitle,
   applyStatusUnlock,
@@ -98,7 +98,7 @@ function applyMainStats(ctx) {
   const cap = {
     power: Math.round(Math.max(60, stats.power * 0.6) * growthMult),
     maxHp: Math.round(Math.max(40, stats.maxHp * 0.5) * growthMult),
-    gold: Math.round(Math.max(2000 * currencyOf(app.state.life)[1], stats.gold * 5) * growthMult),
+    gold: Math.max(1, Math.round(Math.max(2000 * currencyOf(app.state.life)[1], stats.gold * 5) * growthMult)),
     fame: Math.round(Math.max(30, stats.fame * 0.6) * growthMult),
   };
   for (const k of ['hp', 'maxHp', 'power', 'gold', 'fame']) {
@@ -183,18 +183,40 @@ function clampStats(ctx) {
   stats.power = Math.max(0, stats.power);
 }
 
-// another currency on the player's word; money_rate (new units per old) converts what they hold, within sane bounds
+// the outcome goes into the narrator's history (money_done) so it doesn't ask again; a switch to the unit already
+// shown is ignored in case it does
 function applyMoneyUnit(ctx) {
-  const u = ctx.reply.money_unit;
-  if (typeof u !== 'string' || !u.trim()) return;
+  const o = ctx.reply;
+  delete o.money_done; // only the game writes it
+  const unit = typeof o.money_unit === 'string' && cutLine(o.money_unit, LIMITS.text.moneyUnit);
+  if (!unit) return;
   const life = app.state.life;
-  const rate = Number(ctx.reply.money_rate);
-  const from = moneyText(ctx.stats.gold, life);
-  life.unit = cutLine(u, LIMITS.text.name);
-  if (!(rate >= 1e-4 && rate <= 1e4)) return;
-  life.scale = currencyOf(life)[1] * rate;
-  ctx.stats.gold = Math.round(ctx.stats.gold * rate);
-  ctx.notes.push(T('Money: {from} → {to}', { from, to: moneyText(ctx.stats.gold, life) }));
+  const was = { ...life };
+  const names = l => [moneyUnit(l, 'en'), moneyUnit(l, storyLang())].map(normName);
+  if (names(life).includes(normName(unit))) return;
+  // the player's note and the narrator's history line
+  const report = say => {
+    ctx.notes.push(say(uiLang()));
+    o.money_done = say(promptLang());
+  };
+  // models put "" or 0 where no rate belongs: that is a plain rename
+  const plain = !o.money_rate;
+  const rate = plain ? 1 : Number(o.money_rate);
+  const gold = Math.round(ctx.stats.gold * rate);
+  const scale = currencyOf(life)[1] * rate;
+  const max = LIMITS.move.moneyRate;
+  const inRange = x => x >= 1 / max && x <= max;
+  // a rate the wrong way round must not wipe what they hold
+  const ok = inRange(rate) && inRange(scale) && Number.isSafeInteger(gold) && (gold > 0 || !ctx.stats.gold);
+  if (!ok) return report(l => tIn(l, 'Money: not converted'));
+  if (!plain) life.scale = scale;
+  // back to the life's own money: its label is translated again
+  if (names({ ...life, unit: undefined }).includes(normName(unit))) delete life.unit;
+  else life.unit = unit;
+  report(l =>
+    tIn(l, 'Money: {from} → {to}', { from: moneyText(ctx.stats.gold, was, l), to: moneyText(gold, life, l) }),
+  );
+  ctx.stats.gold = gold;
 }
 
 /* ---- titles, items, ledger ---- */

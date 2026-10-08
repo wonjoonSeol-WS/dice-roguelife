@@ -91,6 +91,7 @@ export function turnText(t, trim, noAdmin) {
       headline: o.widget.headline ? ' ' + o.widget.headline : '',
     });
   if (o.choices && o.choices.length) s += pl('\nChoices: {list}', { list: o.choices.join(' / ') });
+  if (o.money_done) s += '\n' + pl('[System] {text}', { text: o.money_done });
   return s;
 }
 // names in the screen's language, texts in the prompt's

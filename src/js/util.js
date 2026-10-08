@@ -59,6 +59,11 @@ export async function inParallel(items, n, fn) {
   await Promise.all(Array.from({ length: Math.min(n, queue.length) }, worker));
 }
 
+// a name to compare: no spaces, lower case
+export const normName = x =>
+  String(x || '')
+    .replace(/\s+/g, '')
+    .toLowerCase();
 export function cutLine(v, n) {
   const t = String(v).replace(/\s+/g, ' ').trim();
   if (t.length <= n) return t;

@@ -98,11 +98,13 @@ function applyFix(fix) {
   const notes = [];
   if (!fix || typeof fix !== 'object') return notes; /* only bounded, plausible corrections */
   const cf = currencyOf(app.state.life)[1];
-  const cap = Math.max(1000 * cf, Math.abs(app.state.stats.gold || 0) * 2);
+  const cap = Math.max(1, 1000 * cf, Math.abs(app.state.stats.gold || 0) * 2);
   const g = Math.round(Number(fix.gold) || 0);
   if (g && Math.abs(g) <= cap) {
     app.state.stats.gold = Math.max(0, (app.state.stats.gold || 0) + g);
-    notes.push(T('Money {delta}', { delta: (g > 0 ? '+' : '') + moneyText(g, app.state.life) }));
+    notes.push(
+      tIn(storyLang(), 'Money {delta}', { delta: (g > 0 ? '+' : '') + moneyText(g, app.state.life, storyLang()) }),
+    );
   }
   for (const it of (Array.isArray(fix.items) ? fix.items : []).slice(0, 6)) {
     const name = String((it && it.name) || '')
@@ -138,18 +140,18 @@ function applyFix(fix) {
       if (v === null || v === '') {
         if (k in app.state.ledger) {
           delete app.state.ledger[k];
-          notes.push(T('Ledger closed: {entry}', { entry: k }));
+          notes.push(tIn(storyLang(), 'Ledger closed: {entry}', { entry: k }));
         }
       } else {
         app.state.ledger[k] = cutLine(v, 60);
-        notes.push(T('Ledger: {entry}', { entry: k }));
+        notes.push(tIn(storyLang(), 'Ledger: {entry}', { entry: k }));
       }
     }
   }
   for (const r of (Array.isArray(fix.relations) ? fix.relations : []).slice(0, 3)) {
     if (r && r.name) {
       app.state.relations[String(r.name).slice(0, 30)] = String(r.note || '').slice(0, 200);
-      notes.push(T('Relationship: {name}', { name: String(r.name).slice(0, 20) }));
+      notes.push(tIn(storyLang(), 'Relationship: {name}', { name: String(r.name).slice(0, 20) }));
     }
   }
   return notes;
