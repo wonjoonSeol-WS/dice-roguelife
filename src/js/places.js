@@ -2,7 +2,7 @@
 import { pick } from './util.js';
 import { EMOS } from './data.js';
 import { app } from './app.js';
-import { bgKey, fitsWorld, imgById } from './images.js';
+import { bgKey, fitsWorld, turnImg } from './images.js';
 
 function bgList() {
   const w = app.state.life.world.id,
@@ -133,12 +133,9 @@ export function findPlace(name, clockTime, label) {
   const recent = new Set(
     app.turns
       .slice(-12)
-      .map(t => t.img && t.img.scene)
+      .map(t => t.img && turnImg(t.img, t.img.scene))
       .filter(Boolean)
-      .map(id => {
-        const x = imgById(id);
-        return x ? baseOfKey(bgKey(x)) : '';
-      }),
+      .map(x => baseOfKey(bgKey(x))),
   );
   const score = b => {
     const o = P[b];

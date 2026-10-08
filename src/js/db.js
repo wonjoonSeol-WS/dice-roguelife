@@ -220,6 +220,12 @@ export async function inflate(list) {
       }
       delete d.z;
     }
+    // the oldest turns kept their pictures on out
+    if (!d.img && d.out && (d.out.scene_img || d.out.char_img)) {
+      d.img = {};
+      if (d.out.scene_img) d.img.scene = d.out.scene_img;
+      if (d.out.char_img) d.img.char = d.out.char_img;
+    }
     out.push(d);
   }
   return out;

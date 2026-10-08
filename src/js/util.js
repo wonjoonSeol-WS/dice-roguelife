@@ -50,6 +50,14 @@ export async function sha256Hex(blob) {
   const digest = await crypto.subtle.digest('SHA-256', await blob.arrayBuffer());
   return [...new Uint8Array(digest)].map(x => x.toString(16).padStart(2, '0')).join('');
 }
+// run fn over items, a few at a time
+export async function inParallel(items, n, fn) {
+  const queue = [...items];
+  const worker = async () => {
+    while (queue.length) await fn(queue.shift());
+  };
+  await Promise.all(Array.from({ length: Math.min(n, queue.length) }, worker));
+}
 
 export function cutLine(v, n) {
   const t = String(v).replace(/\s+/g, ' ').trim();

@@ -5,9 +5,8 @@ import { platform } from './db.js';
 import { app } from './app.js';
 import { logErr } from './diag.js';
 import { T } from './i18n.js';
-import { IMGX } from './library.js';
 import { LIMITS } from './limits.js';
-import { charSets, charSetsAll, fitsWorld, genderOf, pickEmotion } from './images.js';
+import { charSets, charSetsAll, fitsWorld, genderOf, imagesVer, pickEmotion } from './images.js';
 
 const normName = x =>
   String(x || '')
@@ -127,7 +126,7 @@ function hayWords(k) {
 // words on more than half of the sets (hair, smile, female) tell one person from another no better than chance: zero weight, no word list needed
 let commonMemo = { key: '', set: new Set() };
 export function commonWords() {
-  const key = app.images.length + ':' + (IMGX.ver || 0);
+  const key = app.images.length + ':' + imagesVer();
   if (commonMemo.key === key) return commonMemo.set;
   const ks = Object.keys(charSetsAll());
   const df = new Map();
@@ -149,7 +148,7 @@ function setLevelTags(k, imgs) {
   return [...c.entries()].filter(([t, n]) => n >= need && t !== k.toLowerCase()).map(([t]) => t);
 }
 export function tagVocab(n = 60) {
-  const key = app.images.length + ':' + (IMGX.ver || 0);
+  const key = app.images.length + ':' + imagesVer();
   if (vocabMemo.key === key) return vocabMemo.list.slice(0, n);
   const cnt = new Map();
   for (const [k, imgs] of Object.entries(charSetsAll())) {
@@ -180,7 +179,7 @@ function editDist(a, b) {
 }
 let tagWordsMemo = { key: '', set: new Set() };
 function tagWords() {
-  const key = app.images.length + ':' + (IMGX.ver || 0);
+  const key = app.images.length + ':' + imagesVer();
   if (tagWordsMemo.key === key) return tagWordsMemo.set;
   const set = new Set();
   for (const x of app.images)
