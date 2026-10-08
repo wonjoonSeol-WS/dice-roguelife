@@ -21,9 +21,9 @@ const read = path => readFileSync(join(ROOT, path), 'utf8');
 export const version = () => JSON.parse(read('package.json')).version;
 
 // one classic script: the artifact page has no module loader to rely on
-export async function bundle(ver) {
+export async function bundle(ver, entry = join(ROOT, 'src', 'js', 'main.js')) {
   const result = await esbuild({
-    entryPoints: [join(ROOT, 'src', 'js', 'main.js')],
+    entryPoints: [entry],
     bundle: true,
     format: 'iife',
     target: 'es2022',
@@ -37,12 +37,12 @@ export async function bundle(ver) {
 }
 
 // { html, js }: the page and the bundled script in it. ver stamps a version other than package.json's (a release
-// checks the new version before writing it)
-export async function build(ver = version()) {
-  const js = await bundle(ver);
+// checks the new version before writing it); entry and css build another page from the same game (standalone/)
+export async function build(ver = version(), { entry, css = '' } = {}) {
+  const js = await bundle(ver, entry);
   const blocks = {
     '<!-- build:version -->': ver,
-    '<!-- build:styles -->': `<style>\n${read('src/styles.css')}</style>`,
+    '<!-- build:styles -->': `<style>\n${read('src/styles.css')}${css}</style>`,
     '<!-- build:scripts -->': `<script>\n${js}</script>`,
   };
   let html = read('src/index.html');

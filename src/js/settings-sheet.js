@@ -303,6 +303,7 @@ function bindSettings(root) {
   q('diag')
     .closest('details')
     .addEventListener('toggle', e => e.target.open && runDiag(q('diag')), { once: true });
+  if (host().bindSettings) host().bindSettings(root);
 }
 function bindPlainSetting(q, { id, key, show, parse, apply, saved }) {
   const el = q(id);

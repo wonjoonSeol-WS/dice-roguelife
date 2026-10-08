@@ -7,6 +7,13 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for the module map and [RELEASING.md](REL
 Short, and only where the code can't explain itself (a non-obvious why). Design notes and how-tos go here or in
 ARCHITECTURE.md, not in code.
 
+## The artifact comes first
+
+The claude.ai artifact is the game. The optional standalone add-on (`standalone/`, its README) runs it on a local server
+with API keys; it stays out of the artifact build and reaches the game only through `registerHost` and the host's
+optional `bindSettings` (`src/js/host.js`). Don't add host checks or standalone code to `src/`. Its tests run with
+`npm run test:standalone`, not `npm test`, and its screen text uses its own catalogs (`standalone/locales`, `tr()`).
+
 ## Translation (i18n)
 
 English is the source language. Each other language is a JSON map keyed by the English: `src/locales/ko.json`,

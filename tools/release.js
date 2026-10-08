@@ -7,12 +7,22 @@
 //   node tools/release.js --mark-prompt   record prompts.json as the prompt now live in the DB
 //                                         (and refresh that record inside the package in OUT_DIR)
 //
-// Output goes to ./dist unless OUT_DIR is set: the page dice-roguelife.html, the handoff zip, and livedb/ when the
-// prompt changed. npm run release / lint run the same commands. Publishing the page and writing config/prompt are
-// done with the Artifact tool afterwards (RELEASING.md).
-import { spawnSync } from 'node:child_process';
-import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { join, relative, sep } from 'node:path';
+// Output goes to ./dist unless OUT_DIR is set: the page dice-roguelife.html, the standalone zip, the handoff zip, and
+// livedb/ when the prompt changed. npm run release / lint run the same commands. Publishing the page and writing
+// config/prompt are done with the Artifact tool afterwards (RELEASING.md).
+import { spawn, spawnSync } from 'node:child_process';
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
+import { tmpdir } from 'node:os';
+import { dirname, join, relative, sep } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { isDeepStrictEqual } from 'node:util';
 import { Script } from 'node:vm';
@@ -24,9 +34,19 @@ import { check as checkI18n } from './i18n-check.js';
 const OUT = process.env.OUT_DIR || join(ROOT, 'dist');
 const RELEASED = join(ROOT, 'tools', '.released_prompt.json');
 const MARK = 'tools/.released_prompt.json'; // its path inside the package
-const LINTED = ['src/js', 'tools', 'tests']; // what ESLint and the comment scan read
-const FORMATTED = ['src', 'tools', 'tests', 'eslint.config.js', 'playwright.config.js']; // what Prettier keeps in shape
-const NOT_PACKAGED = new Set(['.git', 'node_modules', 'dist', 'data', 'shots', 'test-results', 'playwright-report']); // data: local image libraries, never shipped
+const LINTED = ['src/js', 'tools', 'tests', 'standalone']; // what ESLint and the comment scan read
+const FORMATTED = ['src', 'tools', 'tests', 'standalone', 'eslint.config.js', 'playwright.config.js']; // what Prettier keeps in shape
+// data: local image libraries, never shipped; worktrees: other checkouts (.claude/worktrees)
+const NOT_PACKAGED = new Set([
+  '.git',
+  'node_modules',
+  'dist',
+  'data',
+  'shots',
+  'test-results',
+  'playwright-report',
+  'worktrees',
+]);
 const USAGE = 'usage: node tools/release.js <x.y.z> [--fast] | --check | --mark-prompt';
 
 const at = (...parts) => join(ROOT, ...parts);
@@ -96,14 +116,15 @@ function checkFormat() {
   if (r.status !== 0) die(`Prettier did not run (exit ${r.status})\n` + (r.stderr || r.stdout || '').slice(-800));
 }
 
-// syntax of the bundled script, then lint, format, and code swallowed by a line comment
-async function check(js) {
-  pinned('esbuild'); // the bundle came from the pinned esbuild
-  try {
-    new Script(js, { filename: 'bundle.js' });
-  } catch (e) {
-    die('syntax error in the bundle\n' + e.message);
-  }
+// syntax of each bundled script ({ page: js }), then lint, format, and code swallowed by a line comment
+async function check(bundles) {
+  pinned('esbuild'); // the bundles came from the pinned esbuild
+  for (const [page, js] of Object.entries(bundles))
+    try {
+      new Script(js, { filename: page });
+    } catch (e) {
+      die(`syntax error in the script of ${page}\n` + e.message);
+    }
   await lint();
   checkFormat();
   // a '//' comment that swallowed code on its line passes syntax and lint, so look for it
@@ -123,23 +144,102 @@ function runTests(page) {
   if (r.status !== 0) die('tests failed');
 }
 
+const zipName = kind => new RegExp(`^dice-roguelife-${kind}-v.*\\.zip$`);
+// writes dice-roguelife-<kind>-v<x_y_z>.zip in OUT in place of any older one, and returns its path
+function writeZip(kind, ver, files) {
+  mkdirSync(OUT, { recursive: true });
+  const older = zipName(kind);
+  for (const f of readdirSync(OUT)) if (older.test(f)) rmSync(join(OUT, f));
+  const zp = join(OUT, `dice-roguelife-${kind}-v${ver.replaceAll('.', '_')}.zip`);
+  writeFileSync(zp, zipSync(files, { level: 6 }));
+  return zp;
+}
+
 // the handoff zip: the whole source tree without installs, builds, screenshots and test reports
 function makePackage(ver) {
-  mkdirSync(OUT, { recursive: true });
-  for (const f of readdirSync(OUT)) if (/^dice-roguelife-handoff-v.*\.zip$/.test(f)) rmSync(join(OUT, f));
   const files = {};
   const walk = dir => {
     for (const e of readdirSync(dir, { withFileTypes: true }).sort((a, b) => (a.name < b.name ? -1 : 1))) {
       const full = join(dir, e.name);
+      // by name first: node_modules may be a link (a worktree sharing another checkout's)
+      if (NOT_PACKAGED.has(e.name) || e.isSymbolicLink()) continue;
       if (e.isDirectory()) {
-        if (!NOT_PACKAGED.has(e.name)) walk(full);
-      } else if (!/\.(png|zip)$/.test(e.name)) files[rel(full)] = readFileSync(full);
+        // a standalone data folder, whatever it's called, holds saves and API keys
+        if (!existsSync(join(full, 'dice-roguelife.db'))) walk(full);
+      } else if (
+        !/\.(png|zip)$/.test(e.name) &&
+        !['standalone/config.json', 'standalone/page.html'].includes(rel(full))
+      )
+        files[rel(full)] = readFileSync(full);
     }
   };
   walk(ROOT);
-  const zp = join(OUT, `dice-roguelife-handoff-v${ver.replaceAll('.', '_')}.zip`);
-  writeFileSync(zp, zipSync(files, { level: 6 }));
-  return zp;
+  return writeZip('handoff', ver, files);
+}
+
+// the artifact page and the standalone download's page, built together and checked
+async function buildPages(ver) {
+  const { buildPage } = await import('../standalone/page.js');
+  const [artifact, standalone] = await Promise.all([build(ver), buildPage(ver)]);
+  await check({ 'dice-roguelife.html': artifact.js, 'standalone/page.html': standalone.js });
+  return { artifact, standalone };
+}
+
+// the standalone download (RELEASING.md): its server, its page and a package.json to start it with no installs
+function makeStandalone(ver, html) {
+  const pkg = readJson(at('package.json'));
+  const manifest = {
+    name: 'dice-roguelife-standalone',
+    version: ver,
+    private: true,
+    type: 'module',
+    engines: pkg.engines,
+    scripts: { start: 'node standalone/start.js' },
+  };
+  const files = {
+    'package.json': Buffer.from(JSON.stringify(manifest, null, 2) + '\n'),
+    LICENSE: readFileSync(at('LICENSE')),
+    'standalone/page.html': Buffer.from(html),
+  };
+  for (const f of STANDALONE_FILES) files['standalone/' + f] = readFileSync(at('standalone', f));
+  return writeZip('standalone', ver, files);
+}
+// shipped by name, so nothing else in the folder (notes, a leftover page.html or config.json) goes out with it
+const STANDALONE_FILES = ['start.js', 'server.js', 'store.js', 'relay.js', 'lines.js', 'page.js', 'README.md'];
+
+// the standalone zip as a downloader runs it: unpacked on its own, `npm start` (start.js) serves a page with its token
+async function tryStandalone(zp) {
+  const dir = mkdtempSync(join(tmpdir(), 'dr-standalone-zip-'));
+  let failure = null;
+  try {
+    for (const [name, bytes] of Object.entries(unzipSync(readFileSync(zp)))) {
+      mkdirSync(join(dir, dirname(name)), { recursive: true });
+      writeFileSync(join(dir, name), bytes);
+    }
+    const home = join(dir, 'home');
+    const port = 20000 + Math.floor(Math.random() * 20000);
+    mkdirSync(home);
+    writeFileSync(join(home, 'config.json'), JSON.stringify({ port }));
+    const env = { ...process.env, DICE_ROGUELIFE_HOME: home };
+    const child = spawn(process.execPath, [join(dir, 'standalone', 'start.js')], { env });
+    try {
+      let out = '';
+      await new Promise((resolve, reject) => {
+        const timer = setTimeout(() => reject(new Error('no start in 20 s: ' + out)), 20_000);
+        child.stdout.on('data', d => (out += d) && out.includes(`localhost:${port}`) && resolve(clearTimeout(timer)));
+        child.stderr.on('data', d => (out += d));
+        child.on('exit', code => reject(new Error(`it exited (${code}): ${out}`)));
+      });
+      const page = await (await fetch(`http://127.0.0.1:${port}/`)).text();
+      if (!/window\.DR_SERVER_TOKEN="[0-9a-f]{64}"/.test(page)) throw new Error('its page has no token');
+    } finally {
+      if (child.exitCode === null) await new Promise(resolve => child.once('exit', resolve).kill());
+    }
+  } catch (e) {
+    failure = e;
+  }
+  rmSync(dir, { recursive: true, force: true, maxRetries: 5 });
+  if (failure) die('the standalone zip does not start: ' + failure.message);
 }
 
 // swap the live-prompt record inside an existing package, leaving every other file as it was built
@@ -153,7 +253,7 @@ function markPrompt() {
   copyFileSync(at('prompts.json'), RELEASED);
   console.log('prompts.json recorded as live');
   // packaged before the DB write, so its record is stale
-  const zips = existsSync(OUT) ? readdirSync(OUT).filter(f => /^dice-roguelife-handoff-v.*\.zip$/.test(f)) : [];
+  const zips = existsSync(OUT) ? readdirSync(OUT).filter(f => zipName('handoff').test(f)) : [];
   for (const z of zips) {
     refreshMark(join(OUT, z));
     console.log('record refreshed in', join(OUT, z));
@@ -172,10 +272,12 @@ function setVersion(ver) {
 }
 
 async function release(ver, fast) {
-  const { html, js } = await build(ver);
-  console.log('1. built, version', ver);
-  await check(js);
-  console.log('2. syntax, lint and format ok');
+  const { artifact, standalone } = await buildPages(ver);
+  const { html } = artifact;
+  console.log('1-2. built version', ver, '| syntax, lint and format ok');
+  // before anything else is written, so a download that doesn't start stops the release clean
+  const standaloneZip = makeStandalone(ver, standalone.html);
+  await tryStandalone(standaloneZip);
   setVersion(ver);
   const page = writePage(html);
   if (fast) console.log('3. tests skipped (--fast)');
@@ -186,7 +288,7 @@ async function release(ver, fast) {
   const outPage = join(OUT, 'dice-roguelife.html');
   mkdirSync(OUT, { recursive: true });
   if (outPage !== PAGE) copyFileSync(page, outPage);
-  console.log('4. page ->', outPage, '| package ->', makePackage(ver));
+  console.log('4. page ->', outPage, '| package ->', makePackage(ver), '| standalone (starts) ->', standaloneZip);
   const live = existsSync(RELEASED) ? readJson(RELEASED) : null;
   if (isDeepStrictEqual(live, readJson(at('prompts.json')))) {
     console.log('5. prompt unchanged since the last release');
@@ -202,7 +304,7 @@ async function release(ver, fast) {
 const argv = process.argv.slice(2);
 if (argv.includes('--mark-prompt')) markPrompt();
 else if (argv.includes('--check')) {
-  await check((await build()).js);
+  await buildPages();
   console.log('syntax, lint and format ok');
 } else if (/^\d+\.\d+\.\d+$/.test(argv[0] || '')) await release(argv[0], argv.includes('--fast'));
 else die(USAGE);

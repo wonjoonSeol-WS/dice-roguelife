@@ -198,7 +198,7 @@ Claudeだけ**です。別のアダプターを書けば Gemini のようなホ�
 
 ## 開発
 
-Node.js 20.19 以降（または 22.13 以降）が必要です。開発ツールはすべて `package.json` でバージョンを固定した npm パッケージです。
+Node.js 22.13 以降が必要です。開発ツールはすべて `package.json` でバージョンを固定した npm パッケージです。
 
 ```
 npm ci                             # esbuild、ESLint、Prettier、Playwright（固定バージョン）
@@ -219,6 +219,13 @@ npm run release -- 2.5.0   # バージョンを上げて、検査、テスト、
 - テストを1つだけ実行するには `npx playwright test smoke`、ブラウザで見るには `--headed`、失敗を順に追うには
   `npx playwright show-trace` か `--ui` を使います。
 - 構造、ターンの流れ、セーブ形式は [ARCHITECTURE.md](ARCHITECTURE.md)、リリース手順は [RELEASING.md](RELEASING.md) を参照してください（どちらも韓国語）。
+
+## オプション：スタンドアロン版（開発者向け）
+
+遊ぶのはアーティファクトが基本です。API キーやローカルモデル（Ollama、LM Studio など）で自分のコンピューターで動かしたい方向けに、
+コミュニティが管理するアドオンが [standalone/](standalone/README.md) にあります：[最新リリース](https://github.com/wonjoonSeol-WS/dice-roguelife/releases/latest)から
+`dice-roguelife-standalone-v….zip` をダウンロードして展開し、`npm start`（Node.js 22.13 以降、インストール不要）。アーティファクトとは
+別ファイルで（アーティファクトのページは `dice-roguelife.html` のまま）、アーティファクトのビルドには含まれません。スマホでも遊びたい場合は、Tailscale で自分のコンピューターに接続できます（その README を参照）。
 
 ## ライセンス
 

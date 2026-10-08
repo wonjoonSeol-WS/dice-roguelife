@@ -1,4 +1,5 @@
-// Lint rules for the game's modules (src/js), the Node tools (tools/, the configs) and the tests (tests/).
+// Lint rules for the game's modules (src/js), the Node tools (tools/, the configs), the tests (tests/) and the
+// standalone add-on (standalone/).
 import globals from 'globals';
 
 const rules = {
@@ -24,7 +25,7 @@ const rules = {
 
 export default [
   {
-    files: ['src/js/**/*.js'],
+    files: ['src/js/**/*.js', 'standalone/client/**/*.js'],
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
@@ -33,13 +34,13 @@ export default [
     rules,
   },
   {
-    files: ['tools/**/*.js', '*.config.js'],
+    files: ['tools/**/*.js', '*.config.js', 'standalone/*.js'],
     languageOptions: { ecmaVersion: 'latest', sourceType: 'module', globals: globals.node },
     rules,
   },
   {
     // specs run in Node, and the functions they hand to page.evaluate run in the page, where window.DR is the game
-    files: ['tests/**/*.js', 'tools/shots.js'],
+    files: ['tests/**/*.js', 'tools/shots.js', 'standalone/tests/**/*.js'],
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',

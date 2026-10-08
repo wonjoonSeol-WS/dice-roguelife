@@ -200,7 +200,7 @@ is supported**; another adapter could add a host like Gemini. GPT has nothing li
 
 ## Development
 
-You need Node.js 20.19 or later (or 22.13 or later). The dev tools are all npm packages pinned in `package.json`.
+You need Node.js 22.13 or later. The dev tools are all npm packages pinned in `package.json`.
 
 ```
 npm ci                             # esbuild, ESLint, Prettier, Playwright (pinned versions)
@@ -224,6 +224,15 @@ npm run release -- 2.5.0   # bump the version, check, test, package
   `npx playwright show-trace` or `--ui`.
 - See [ARCHITECTURE.md](ARCHITECTURE.md) for the structure, the turn flow and the save format, and
   [RELEASING.md](RELEASING.md) for the release steps (both in Korean).
+
+## Optional: standalone (for developers)
+
+The artifact is the way to play. For people who would rather run the game on their own computer with an API key or a
+local model (Ollama, LM Studio and others), there is a community-maintained add-on in [standalone/](standalone/README.md):
+download `dice-roguelife-standalone-v….zip` from the [latest release](https://github.com/wonjoonSeol-WS/dice-roguelife/releases/latest), unzip it and run `npm start` (Node.js
+22.13 or later, nothing to install). It is a separate download: the artifact page is still `dice-roguelife.html`, and
+the artifact build doesn't include the add-on. To play on your phone as well, reach your computer through Tailscale
+(see that README).
 
 ## License
 

@@ -115,11 +115,14 @@
 게임은 호스트(지금은 claude.ai 아티팩트 런타임)에 직접 닿지 않고 `host()`가 고른 어댑터를 거칩니다. `window.claude`와
 파일 주소(`/_blob/`)는 `host-claude.js` 안에만 있습니다.
 
-- 어댑터: `id`, `available()`, `connect(capability)`(핸들 또는 `null`), `assetUrl(id)`.
+- 어댑터: `id`, `available()`, `connect(capability)`(핸들 또는 `null`), `assetUrl(id)`, 선택으로 `bindSettings(root)`.
 - 핸들이 지켜야 할 모양(게임이 쓰는 것만)은 `host.js` 머리 주석에 적혀 있습니다: `db`(문서 저장소), `sample`(모델 호출과
   오류 코드), `assets`(파일 저장소), `user`, `downloads`.
 - 다른 호스트(예: Gemini 아티팩트)는 같은 모양을 주는 어댑터 파일을 만들고 `HOSTS`에 넣으면 됩니다. 아무 호스트도 없으면
   기능 없이 메모리에서 돕니다.
+- 선택 애드온인 독립 실행판(`standalone/`, [standalone/README.md](standalone/README.md))은 이 빌드 밖의 어댑터입니다. 자기
+  진입점에서 `registerHost()`로 끼어들고, 설정 시트에는 선택 훅 `bindSettings(root)`로만 닿습니다. 아티팩트 빌드에는
+  들어가지 않습니다.
 
 ## 턴 하나의 흐름
 

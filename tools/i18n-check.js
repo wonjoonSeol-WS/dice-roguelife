@@ -122,6 +122,16 @@ export function check({ list = false } = {}) {
     ja = cat('ja');
   const keys = new Map([...page.keys, ...mod.keys]);
   const errors = [...mod.errors, ...page.errors];
+  // An ASCII shell pipe can destroy translations before a UTF-8 write occurs.
+  const damaged = text => /\?{3,}|\uFFFD/.test(text);
+  for (const [lang, catalog] of [
+    ['ko', ko],
+    ['ja', ja],
+  ])
+    for (const [key, value] of Object.entries(catalog))
+      if (damaged(value)) errors.push(`src/locales/${lang}.json: possible encoding damage: ${JSON.stringify(key)}`);
+  for (const name of ['README.md', 'README.ko.md', 'README.ja.md'])
+    if (damaged(readFileSync(join(ROOT, name), 'utf8'))) errors.push(`${name}: possible encoding damage`);
   const has = (c, k) => k in c || k.split('|')[0] in c;
   const promptOnly = k => {
     const u = mod.uses.get(k);

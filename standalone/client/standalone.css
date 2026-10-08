@@ -1,0 +1,36 @@
+/* standalone add-on (standalone/client/standalone.css) */
+.provider-fields {
+  white-space: normal;
+}
+.provider-fields,
+.provider-fields * {
+  box-sizing: border-box;
+}
+.provider-fields .field {
+  margin-top: 10px;
+}
+.provider-fields input:not([type='checkbox']),
+.provider-fields select,
+.provider-fields textarea {
+  width: 100%;
+  min-width: 0;
+}
+.api-advanced {
+  margin-top: 10px;
+}
+.api-advanced > summary {
+  cursor: pointer;
+}
+.provider-fields .grow {
+  min-width: 0;
+}
+.provider-fields .row {
+  flex-wrap: wrap;
+}
+/* the artifact's plan-tier check and document quota don't apply here (#dbGauge also shows export progress) */
+.tier-probe,
+#dbGauge .gauge-head,
+#dbGauge .gauge-bar,
+#dbGauge .gauge-msg {
+  display: none;
+}

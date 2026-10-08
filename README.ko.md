@@ -191,7 +191,7 @@ claude.ai 아티팩트 하나로 배포해요. Claude 호출(`sample`), 저장(`
 
 ## 개발
 
-필요한 것: Node.js 20.19 이상(또는 22.13 이상). 개발 도구는 모두 `package.json`에 고정된 npm 패키지입니다.
+필요한 것: Node.js 22.13 이상. 개발 도구는 모두 `package.json`에 고정된 npm 패키지입니다.
 
 ```
 npm ci                             # esbuild, ESLint, Prettier, Playwright (고정 버전)
@@ -213,6 +213,13 @@ npm run release -- 2.2.0   # 버전 올리기, 검사, 테스트, 패키지
   `npx playwright show-trace`나 `--ui`를 씁니다.
 - 구조와 턴 흐름, 저장 형식은 [ARCHITECTURE.md](ARCHITECTURE.md), 배포 절차는 [RELEASING.md](RELEASING.md)를
   보세요.
+
+## 선택: 독립 실행판 (개발자용)
+
+플레이는 아티팩트로 하는 게 기본이에요. API 키나 로컬 모델(Ollama, LM Studio 등)로 내 컴퓨터에서 돌리고 싶은 분을 위해
+커뮤니티가 관리하는 애드온이 [standalone/](standalone/README.md)에 있어요: [최신 릴리스](https://github.com/wonjoonSeol-WS/dice-roguelife/releases/latest)에서
+`dice-roguelife-standalone-v….zip`을 받아 압축을 풀고 `npm start`(Node.js 22.13 이상, 따로 설치할 것 없음). 아티팩트와는
+별도 파일이고(아티팩트 페이지는 그대로 `dice-roguelife.html`), 아티팩트 빌드에는 들어가지 않아요. 폰에서도 하고 싶다면 Tailscale로 내 컴퓨터에 접속하면 돼요(그 README 참고).
 
 ## 라이선스
 
