@@ -405,8 +405,7 @@ function chipLabel(k, v, t) {
 function chipValue(k, v, t, shown) {
   if (!shown && k !== 'gold' && k !== 'age') return v > 0 ? '↑' : '↓';
   const sign = v > 0 ? '+' : '';
-  if (k === 'gold')
-    return sign + moneyText(v, (((t.snap && t.snap.life) || (app.state && app.state.life) || {}).world || {}).id);
+  if (k === 'gold') return sign + moneyText(v, (t.snap && t.snap.life) || (app.state && app.state.life));
   if (k === 'age') return T('{n} {n|yr|yrs}', { n: sign + fmt(v) });
   return sign + fmt(v);
 }

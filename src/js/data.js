@@ -1,7 +1,7 @@
 /* ============ data tables (code owns the rules) ============ */
 import { rnd } from './util.js';
 import { catalogEntry, locale, N_, tIn, UI_LANGS, uiLang } from './i18n.js';
-import { STANCES } from './enums.js';
+import { MONEY, STANCES } from './enums.js';
 
 export const TIERS = ['EX', 'SSS', 'S', 'A', 'B', 'C', 'D', 'E', 'F'];
 export const TIER_P = [
@@ -311,22 +311,35 @@ export const TALENTS = {
     [N_('Weed'), N_('Trampled today, back up tomorrow. Only your recovery is fast')],
   ],
 };
-// others: gold x1
+// others: gold x1; LOCAL: the life's own money (life.money)
+const LOCAL = 'local';
 const CURRENCY = {
-  hunter: [N_('won'), 1000],
-  academy: [N_('won'), 1000],
+  hunter: LOCAL,
+  academy: LOCAL,
   cyber: [N_('credits'), 10],
   apoc: [N_('ration tickets'), 1],
   murim: [N_('nyang'), 1],
   palace: [N_('nyang'), 1],
 };
-export function currencyOf(wid) {
-  return CURRENCY[wid] || [N_('gold'), 1];
+const MONEY_UNIT = {
+  [MONEY.WON]: [N_('won'), 1000],
+  [MONEY.YEN]: [N_('yen'), 100],
+  [MONEY.DOLLARS]: [N_('dollars'), 1],
+};
+const LOCAL_MONEY = { ko: MONEY.WON, ja: MONEY.YEN, en: MONEY.DOLLARS };
+export const moneyFor = lang => LOCAL_MONEY[lang] || MONEY.DOLLARS;
+export function currencyOf(life) {
+  const c = CURRENCY[life && life.world && life.world.id];
+  // lives from before 2.10 have no money and were in won
+  const base = c === LOCAL ? MONEY_UNIT[life.money] || MONEY_UNIT[MONEY.WON] : c || [N_('gold'), 1];
+  // a conversion on the player's word rescaled the money (life.scale)
+  return life && life.scale ? [base[0], life.scale] : base;
 }
-export function moneyText(n, wid, lang = uiLang()) {
+// life.unit: a currency the narrator switched to on the player's word (only the label changes)
+export function moneyText(n, life, lang = uiLang()) {
   return tIn(lang, '{amount} {unit}', {
     amount: Number(n || 0).toLocaleString(locale(lang)),
-    unit: tIn(lang, currencyOf(wid)[0]),
+    unit: (life && life.unit) || tIn(lang, currencyOf(life)[0]),
   });
 }
 export const BASE = {

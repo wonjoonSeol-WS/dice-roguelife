@@ -1,6 +1,6 @@
 /* ============ applying a reply ============ */
 import { cutLine, MARK_RE, pick } from './util.js';
-import { currencyOf, normEmo, REALMS, STAT_LABEL, SUB_STATS, tierRank, TIERS } from './data.js';
+import { currencyOf, moneyText, normEmo, REALMS, STAT_LABEL, SUB_STATS, tierRank, TIERS } from './data.js';
 import { ART_SLOT_LABEL, ART_SLOTS, artsToEnums, SKILL_SRC } from './enums.js';
 import { T, tIn } from './i18n.js';
 import { LIMITS } from './limits.js';
@@ -21,6 +21,7 @@ const APPLY_STEPS = [
   applyMainStats,
   applySubStats,
   applyEnergy,
+  applyMoneyUnit,
   clampStats,
   applyTitle,
   applyStatusUnlock,
@@ -97,7 +98,7 @@ function applyMainStats(ctx) {
   const cap = {
     power: Math.round(Math.max(60, stats.power * 0.6) * growthMult),
     maxHp: Math.round(Math.max(40, stats.maxHp * 0.5) * growthMult),
-    gold: Math.round(Math.max(2000 * currencyOf(app.state.life.world.id)[1], stats.gold * 5) * growthMult),
+    gold: Math.round(Math.max(2000 * currencyOf(app.state.life)[1], stats.gold * 5) * growthMult),
     fame: Math.round(Math.max(30, stats.fame * 0.6) * growthMult),
   };
   for (const k of ['hp', 'maxHp', 'power', 'gold', 'fame']) {
@@ -180,6 +181,20 @@ function clampStats(ctx) {
   stats.hp = Math.min(stats.hp, stats.maxHp);
   stats.gold = Math.max(0, stats.gold);
   stats.power = Math.max(0, stats.power);
+}
+
+// another currency on the player's word; money_rate (new units per old) converts what they hold, within sane bounds
+function applyMoneyUnit(ctx) {
+  const u = ctx.reply.money_unit;
+  if (typeof u !== 'string' || !u.trim()) return;
+  const life = app.state.life;
+  const rate = Number(ctx.reply.money_rate);
+  const from = moneyText(ctx.stats.gold, life);
+  life.unit = cutLine(u, LIMITS.text.name);
+  if (!(rate >= 1e-4 && rate <= 1e4)) return;
+  life.scale = currencyOf(life)[1] * rate;
+  ctx.stats.gold = Math.round(ctx.stats.gold * rate);
+  ctx.notes.push(T('Money: {from} → {to}', { from, to: moneyText(ctx.stats.gold, life) }));
 }
 
 /* ---- titles, items, ledger ---- */

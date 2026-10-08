@@ -18,7 +18,7 @@ export function compat(st) {
   if (!st.rules) st.rules = snapshotRules();
   if (Array.isArray(st.quests)) st.quests = dedupeQuests(st.quests);
   if (!st.goldV && st.stats && st.life && st.life.world) {
-    const m = currencyOf(st.life.world.id)[1];
+    const m = currencyOf(st.life)[1];
     if (m > 1) st.stats.gold = Math.round((st.stats.gold || 0) * m);
     st.goldV = 2;
   }

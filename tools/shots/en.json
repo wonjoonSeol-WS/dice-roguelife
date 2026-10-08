@@ -35,7 +35,7 @@
     "time": "11:56 PM",
     "weather": "Cloudy, cold wind",
     "place": "Back alley, nightlife district",
-    "gold": 65000,
+    "gold": 65,
     "skill": {
       "name": "Knack",
       "grade": "C",
@@ -47,8 +47,8 @@
         "note": "One wallet confiscated, one in hand. Five hours until dawn."
       },
       {
-        "title": "Raise 150,000 won for the test",
-        "note": "A private testing center would take 100,000. 38,000 so far. Not happening tonight."
+        "title": "Raise $150 for the test",
+        "note": "A private testing center would take $100. $38 so far. Not happening tonight."
       }
     ],
     "stateNote": "A drunk grabbed you by the collar in the back alley and took a photo of your face. He took one wallet, so only one is left (quota 1/6). The rib pain is getting worse."
@@ -365,7 +365,7 @@
       "title": "Sewer Cartographer",
       "title_effect": "+10% when selling information",
       "stat_changes": {
-        "gold": 60000,
+        "gold": 60,
         "fame": 5
       },
       "choices": [
@@ -416,7 +416,7 @@
           "title": "A kid near Mangwon station sells sewer gate maps and they are ACCURATE",
           "author": "core_runner",
           "views": 18400,
-          "body": "Bought one off a kid outside the convenience store by Mangwon station. Pencil, hand-drawn, red X on C-3. Went down at 2am with my party and the entrance was exactly there. Nobody had it logged. The kid charged me 30k. I would have paid 300k.",
+          "body": "Bought one off a kid outside the convenience store by Mangwon station. Pencil, hand-drawn, red X on C-3. Went down at 2am with my party and the entrance was exactly there. Nobody had it logged. The kid charged me $30. I would have paid $300.",
           "likes": 932,
           "dislikes": 12,
           "comments": [
@@ -491,7 +491,7 @@
             "body": "Mira wants every entrance between Mangwon and Hapjeong on paper before the Association seals them.",
             "objectives": ["Chart gates C-3 to C-6", "Mark the pumping station shortcuts"],
             "location": "Mangwon storm drains",
-            "reward": "400,000 won and a hunter's letter of introduction",
+            "reward": "$400 and a hunter's letter of introduction",
             "note": "Bring your own flashlight",
             "status": "Open"
           },
@@ -504,7 +504,7 @@
             "body": "Two men in suits with Association pins have been asking shopkeepers about a kid with maps.",
             "objectives": ["Learn their names", "Stay unseen"],
             "location": "Mangwon market",
-            "reward": "250,000 won",
+            "reward": "$250",
             "status": "Open"
           },
           {

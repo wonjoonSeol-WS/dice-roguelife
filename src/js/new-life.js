@@ -5,6 +5,7 @@ import {
   cmdName,
   CMDS,
   currencyOf,
+  moneyFor,
   initMurim,
   ORIGINS,
   RACES,
@@ -561,6 +562,7 @@ async function beginLife() {
     for (const s of app.state.skills.filter(s => s.src === SKILL_SRC.INHERITED))
       if (!skills.find(x => x.name === s.name)) skills.push(s);
   }
+  life.money = moneyFor(lang);
   app.state = {
     v: 1,
     goldV: 2,
@@ -569,7 +571,7 @@ async function beginLife() {
     life,
     lifeNo,
     stats: Object.assign(
-      { hp: b.hp, maxHp: b.hp, power: b.power, gold: b.gold * currencyOf(life.world.id)[1], fame: 0, age: life.age },
+      { hp: b.hp, maxHp: b.hp, power: b.power, gold: b.gold * currencyOf(life)[1], fame: 0, age: life.age },
       rollSubStats(life.originTier),
     ),
     title: '',

@@ -40,8 +40,8 @@ English is the source language. Each other language is a JSON map keyed by the E
   regexes in `src/js/reply/<lang>.js`, read only through `reply-words.js` (`matchOdds`, `sysKind`, ...) and
   `calendar.js`. Named groups are the contract: odds `p`, `rest`; title `title`; clock `h`, `m`, `half`, `period`
   (classified by `pm`, `day`, `night`); date `y`, `m` or `mon` (with `months`), `d`. All profiles are tried, since
-  a save can mix languages. A new story language needs a profile, and its prompt should ask for what it reads
-  (`tests/i18n-parse.spec.js` checks the odds tag).
+  a save can mix languages. A new story language needs a profile and its money in `LOCAL_MONEY` (`data.js`), and its
+  prompt should ask for what it reads (`tests/i18n-parse.spec.js` checks the odds tag).
 - `node tools/i18n-check.js --list` (also run by `npm run lint`) fails on a key without Korean, a screen key
   without Japanese (prompt-only `pl()` keys are exempt), differing placeholders, a `${}` inside `T()`, or Korean
   left in a code string. Mark deliberate Korean data with `// i18n-ignore` (or an
