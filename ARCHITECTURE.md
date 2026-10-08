@@ -287,7 +287,7 @@ localStorage만 씁니다: `dr:inputHint`(입력 요령 안내), `dr:choiceHint`
 - 바깥 봉투: `{app: 'dice-roguelife', format: 3, n, d}`. `d`는 안쪽 내용을 gzip한 뒤 Z85로 인코딩한 문자열입니다.
 - 안쪽: `{app, format: 1, appVersion: 'Dice Roguelife, v<버전>', exportedAt, save, state, turns}`. 이미지는 넣지 않습니다.
 - 가져오기는 새 id와 " (가져옴)" 이름으로 새 저장을 만들고, 턴을 다시 묶어 페이지, 상태, 카드 순서로 씁니다.
-- 그림 id는 설치(아티팩트, 단독 실행판)마다 새로 매겨지므로, 파일에 담는 턴에는 `img.keys`(그 턴의 그림 id → 내용 키)를
+- 그림 id는 설치(아티팩트, 독립 실행판)마다 새로 매겨지므로, 파일에 담는 턴에는 `img.keys`(그 턴의 그림 id → 내용 키)를
   붙입니다(`withPicKeys`). 내용 키는 저장된 파일과 처음 올린 파일의 SHA-256 앞 16자(`picKeys`: `shash`, `hash`)입니다.
   이미지 팩은 저장된 파일을 그대로 담으므로, 다른 설치에서 팩을 올리면 그 `hash`가 이쪽의 `shash`와 같습니다. 같은 원본을
   올려도 `hash`가 같습니다. 이 설치의 턴 줄은 바꾸지 않습니다.

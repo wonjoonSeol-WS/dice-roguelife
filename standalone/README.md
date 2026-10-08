@@ -73,8 +73,10 @@ saves, and a new version of the app finds them by itself. To back up, stop the s
 data somewhere else, set `dataDir` in `config.json` (below), or start with the environment variable
 `DICE_ROGUELIFE_HOME` set to another folder.
 
-Moving from the artifact: export your saves (Saves → Save file) and your images (Images → Export pack) there, then
-import them here. Pictures pinned to past turns don't carry over; portraits for new turns do.
+Moving from the artifact: export your saves (Saves → Save file) and your images (Images → Export pack, a zip of the
+pictures and `tags.json`) there. Here, unzip the pack and pick its pictures in Upload images, then its `tags.json` in
+Import tags.json, and your saves in Import save file. Past turns show their pictures again once the same images are here
+(saves exported from 2.9 on).
 
 ## Playing on your phone (Tailscale)
 

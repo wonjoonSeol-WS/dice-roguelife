@@ -31,14 +31,29 @@ export function answerDialog(value) {
   closeSheet();
   if (r) r(value);
 }
-export function askReview(title, pairs) {
+// pics(i): picture URLs shown on row i, so the player can compare them
+export function askReview(title, pairs, { checked = () => true, pics } = {}) {
   // a checklist before a bulk change: unchecked rows are left alone
+  const on = pairs.map((_, i) => !!checked(i));
+  const thumbs = i =>
+    pics
+      ? pics(i)
+          .map(u => `<img class="review-pic" src="${esc(u)}" loading="lazy" decoding="async" alt="">`)
+          .join('')
+      : '';
   const answer = openDialog(
-    `<p class="dlg-msg pre">${esc(title)}</p><div class="review-list">${pairs.map(([a, b], i) => `<label class="row review-item"><input type="checkbox" data-rv="${i}" checked class="review-check"> <span>${esc(a)} → <b>${esc(b)}</b></span></label>`).join('')}</div><div class="row actions"><button class="btn primary" id="rvOk">${T('Apply')}</button><button class="btn ghost" id="rvNo">${T('Cancel')}</button></div>`,
+    `<p class="dlg-msg pre">${esc(title)}</p><div class="review-list">${pairs.map(([a, b], i) => `<label class="row review-item"><input type="checkbox" data-rv="${i}" ${on[i] ? 'checked' : ''} class="review-check">${thumbs(i)} <span>${esc(a)} → <b>${esc(b)}</b></span></label>`).join('')}</div><div class="row actions"><button class="btn primary" id="rvOk">${T('Apply')}</button>${on.includes(false) ? `<button class="btn" id="rvAll">${T('Check all')}</button>` : ''}<button class="btn ghost" id="rvNo">${T('Cancel')}</button></div>`,
   );
-  $('#rvOk').onclick = () =>
-    answerDialog([...document.querySelectorAll('[data-rv]')].filter(c => c.checked).map(c => pairs[+c.dataset.rv]));
+  const boxes = [...document.querySelectorAll('[data-rv]')];
+  // a tap on a picture enlarges it instead of ticking its row
+  $('.review-list').onclick = e => {
+    if (!e.target.classList.contains('review-pic')) return;
+    e.preventDefault();
+    e.target.classList.toggle('big');
+  };
+  $('#rvOk').onclick = () => answerDialog(boxes.filter(c => c.checked).map(c => pairs[+c.dataset.rv]));
   $('#rvNo').onclick = () => answerDialog(null);
+  if ($('#rvAll')) $('#rvAll').onclick = () => boxes.forEach(c => (c.checked = true));
   return answer;
 }
 export let askConfirm = function askConfirm(msg, ok = T('OK')) {

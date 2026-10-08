@@ -11,7 +11,7 @@ import { charSetsAll, genderOf, imgById, imgUrl, setCover, setWorlds, worldChips
 import { capTags, isGeneric, isIdTag, setIds, setTier, TIERS_CAST, toEnglishTags } from './casting.js';
 import { exportPack } from './images-export.js';
 import { setStat, statText } from './stat.js';
-import { groupSimilar, visualSig } from './image-sim.js';
+import { groupSimilar, similar, visualSig } from './image-sim.js';
 import { persist } from './persistence.js';
 import { fillTemplate, pr } from './prompt.js';
 import { N_, T } from './i18n.js';
@@ -1497,10 +1497,12 @@ async function dedupeImages() {
   for (const g of Object.values(groups)) {
     if (g.length < 2) continue;
     g.sort(byOldest);
-    for (const d of g.slice(1)) dups.push([d, g[0], T('same file')]);
+    // no hash: the group is only a name match, a guess like a look-alike
+    for (const d of g.slice(1))
+      dups.push({ d, keep: g[0], why: d.shash ? T('same file') : T('same name'), sure: !!d.shash });
   }
   // 2) the same picture stored again (compressed once more, renamed): compare how they look
-  const gone = new Set(dups.map(([d]) => d.id));
+  const gone = new Set(dups.map(x => x.d.id));
   const left = app.images.filter(x => !gone.has(x.id));
   const items = [],
     sigs = [];
@@ -1520,39 +1522,51 @@ async function dedupeImages() {
   };
   await Promise.all(Array.from({ length: 6 }, worker));
   for (const g of groupSimilar(sigs)) {
-    const xs = g.map(i => items[i]).sort(byOldest);
-    for (const d of xs.slice(1)) dups.push([d, xs[0], T('same picture')]);
+    const [k, ...rest] = g.sort((i, j) => byOldest(items[i], items[j]));
+    // a group can chain through a third picture: offer only copies that look like the one kept
+    for (const i of rest)
+      if (similar(sigs[i], sigs[k])) dups.push({ d: items[i], keep: items[k], why: T('looks the same'), sure: false });
   }
   say('');
   if (!dups.length) {
     toast(T('No duplicate images'));
     return;
   }
-  const pairs = dups.map(([d, , why]) => [`${imgLabel(d)} (${why})`, '']);
-  dups.forEach(([, keep], i) => (pairs[i][1] = imgLabel(keep)));
+  const pairs = dups.map(x => [`${imgLabel(x.d)} (${x.why})`, imgLabel(x.keep)]);
   const sel = await askReview(
-    T(
-      'Found {n} duplicate {n|image|images}. Uncheck any you want to keep. The one uploaded first (after →) stays, and past turns point to it.',
-      { n: dups.length },
-    ),
+    dups.every(x => x.sure)
+      ? T(
+          'Found {n} duplicate {n|image|images}. Uncheck any you want to keep. The one uploaded first (after →) stays, and past turns point to it.',
+          { n: dups.length },
+        )
+      : T(
+          'Found {n} possible duplicate {n|image|images}. Checked ones are deleted. Guesses (looks the same, same name) start unchecked: tap a picture to enlarge it and check the ones that match. The one uploaded first (after →) stays, and past turns point to it.',
+          { n: dups.length },
+        ),
     pairs,
+    // only the same stored file is certain; a guess waits for the player
+    { checked: i => dups[i].sure, pics: i => [imgUrl(dups[i].d.id), imgUrl(dups[i].keep.id)] },
   );
-  if (!sel || !sel.length) return;
+  if (!sel) return;
+  if (!sel.length) {
+    toast(T('Nothing deleted'));
+    return;
+  }
   const chosen = dups.filter((_, i) => sel.includes(pairs[i]));
   app.settings.dupMap = app.settings.dupMap || {};
-  const redirect = new Map(chosen.map(([d, keep]) => [d.id, keep.id]));
+  const redirect = new Map(chosen.map(x => [x.d.id, x.keep.id]));
   const final = id => {
     let t = id;
     for (let i = 0; i < 20 && redirect.has(t); i++) t = redirect.get(t);
     return t;
   };
   let done = 0;
-  await inParallel(chosen, 6, async ([d]) => {
+  await inParallel(chosen, 6, async ({ d }) => {
     say(T('Cleaning up {i}/{n}', { i: ++done, n: chosen.length }));
     await deleteAsset(d.id);
     app.settings.dupMap[d.id] = final(d.id);
   });
-  const removed = new Set(chosen.map(([d]) => d.id));
+  const removed = new Set(chosen.map(x => x.d.id));
   app.images = app.images.filter(i => !removed.has(i.id));
   await IMGX.dropMany([...removed]).catch(e => noteIgnored('images-view: IMGX.dropMany', e));
   for (const [a, b] of Object.entries(app.settings.dupMap)) if (redirect.has(b)) app.settings.dupMap[a] = final(b);
