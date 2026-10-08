@@ -2,7 +2,7 @@
 import { $, esc, fmt, toast } from './util.js';
 import { locale, N_, T } from './i18n.js';
 import { ART_SLOT_LABEL, ART_SLOTS, SKILL_SRC_LABEL } from './enums.js';
-import { powerGrade, REALMS, STAT_LABEL, SUB_STATS, tierRank } from './data.js';
+import { moneyText, powerGrade, REALMS, STAT_LABEL, SUB_STATS, tierRank } from './data.js';
 import { app } from './app.js';
 import { itemBonus, statusVisible, TITLES_MAX, titlesOn } from './rules.js';
 import { openSheet } from './sheet.js';
@@ -92,7 +92,7 @@ export function openStatus() {
     <div class="sw-sec"><h4>${T('STATS')}</h4>
       <div class="sw-grid sw-grid-main">
         ${M ? `<div><small>${T('Realm')}</small><b>${T(REALMS[M.realm])}</b></div><div><small>${T('Inner energy')}</small><b>${T('{n} yrs', { n: M.neigong })}</b></div>` : `<div><small>${T(STAT_LABEL.power)}</small><b>${fmt(s.power)}${itemBonus() ? `<span class="sw-sub"> +${fmt(itemBonus())}</span>` : ''}${SV ? ` <span class="sw-sub">(${powerGrade(app.state.stats.power + itemBonus())})</span>` : ''}</b></div>`}
-        <div><small>${T(STAT_LABEL.gold)}</small><b>${fmt(s.gold)}</b></div><div><small>${T(STAT_LABEL.fame)}</small><b>${fmt(s.fame)}</b></div>
+        <div><small>${T(STAT_LABEL.gold)}</small><b>${esc(moneyText(s.gold, app.state.life))}</b></div><div><small>${T(STAT_LABEL.fame)}</small><b>${fmt(s.fame)}</b></div>
       </div>
       <div class="sw-subs">${SUB_STATS.map(([k, label]) => `<span><span class="sw-label">${T(label)}</span><b>${s[k] || 0}</b></span>`).join('')}</div>
     </div>

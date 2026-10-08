@@ -1,6 +1,6 @@
 /* ============ reroll & fork ============ */
-import { $, clone, cutLine, fmt, noteIgnored, nowIso, toast, uid } from './util.js';
-import { cmdIs, currencyOf } from './data.js';
+import { $, clone, cutLine, noteIgnored, nowIso, toast, uid } from './util.js';
+import { cmdIs, currencyOf, moneyText } from './data.js';
 import { dset } from './db.js';
 import { turnStore } from './turn-store.js';
 import { app, currentRun, exclusive, isIdle } from './app.js';
@@ -97,12 +97,12 @@ export function seenSpan(name) {
 function applyFix(fix) {
   const notes = [];
   if (!fix || typeof fix !== 'object') return notes; /* only bounded, plausible corrections */
-  const cf = (currencyOf(app.state.life.world.id) || [])[1] || 1;
+  const cf = currencyOf(app.state.life)[1];
   const cap = Math.max(1000 * cf, Math.abs(app.state.stats.gold || 0) * 2);
   const g = Math.round(Number(fix.gold) || 0);
   if (g && Math.abs(g) <= cap) {
     app.state.stats.gold = Math.max(0, (app.state.stats.gold || 0) + g);
-    notes.push(T('Money {delta}', { delta: (g > 0 ? '+' : '') + fmt(g) }));
+    notes.push(T('Money {delta}', { delta: (g > 0 ? '+' : '') + moneyText(g, app.state.life) }));
   }
   for (const it of (Array.isArray(fix.items) ? fix.items : []).slice(0, 6)) {
     const name = String((it && it.name) || '')

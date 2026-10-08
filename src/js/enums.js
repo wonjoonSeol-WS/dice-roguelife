@@ -11,6 +11,8 @@ export const ENTRY_LABEL = Object.freeze({
   possess: N_('Possessor'),
 });
 
+export const MONEY = Object.freeze({ WON: 'won', YEN: 'yen', DOLLARS: 'dollars' }); // a modern life's money
+
 export const STANCE = Object.freeze({ INDIFFERENT: 'indifferent', RIVAL: 'rival', HOSTILE: 'hostile', ALLY: 'ally' });
 export const STANCES = Object.freeze(Object.values(STANCE)); // the order data.js STANCE_P weighs them in
 export const STANCE_LABEL = Object.freeze({

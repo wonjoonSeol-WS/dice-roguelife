@@ -12,6 +12,8 @@ const LANGS = [
     saves: 'Saves',
     answer: answer('You wake up in an alley.', 'Run (success chance 60%)', '9:10 PM'),
     world: /^Modern Hunter$/,
+    money: 'dollars',
+    unit: / dollars/,
   },
   {
     lang: 'ja',
@@ -19,6 +21,8 @@ const LANGS = [
     saves: 'セーブ',
     answer: answer('路地裏で目を覚ます。', '走る（成功率 60%）', '午後9時10分'),
     world: /^現代ハンターもの$/,
+    money: 'yen',
+    unit: /円|yen/,
   },
 ];
 
@@ -55,6 +59,7 @@ for (const L of LANGS)
     check(errs, `the life is written in ${L.lang}: ${life.world.name}`, L.world.test(life.world.name));
     check(errs, 'no Korean in the life', !/[가-힣]/.test(JSON.stringify(life)));
     check(errs, 'gender is stored as an enum', life.gender === 'male');
+    check(errs, `a modern world pays in the story's money: ${life.money}`, life.money === L.money);
     ko = await hangulOnScreen(pg);
     check(errs, `play screen has no Korean: ${ko.join(' | ')}`, ko.length === 0);
     check(errs, "the choice's chance is read", (await pg.textContent('#log')).includes('60%'));
@@ -63,6 +68,7 @@ for (const L of LANGS)
     const promptKo = (prompt.match(/[^\n]*[가-힣][^\n]*/g) || []).slice(0, 3);
     check(errs, `the narrator's prompt has no Korean: ${promptKo.join(' | ')}`, prompt.length > 0 && !promptKo.length);
     check(errs, 'the prompt is the English one', prompt.includes('Rules:') && prompt.includes('[World]'));
+    check(errs, "the prompt counts money in the story's unit", L.unit.test(prompt));
     if (L.lang === 'ja') check(errs, 'a Japanese story is told to write in Japanese', prompt.includes('[言語]'));
 
     await pg.click('#gearBtn');

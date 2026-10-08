@@ -234,7 +234,7 @@ function statBlock() {
       },
     ) +
     energy +
-    pl(', money {money}, fame {fame}', { money: moneyText(s.gold, l.world.id, promptLang()), fame: s.fame })
+    pl(', money {money}, fame {fame}', { money: moneyText(s.gold, l, promptLang()), fame: s.fame })
   );
 }
 function murimBlock() {
