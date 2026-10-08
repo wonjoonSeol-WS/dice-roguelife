@@ -332,14 +332,15 @@ export function currencyOf(life) {
   const c = CURRENCY[life && life.world && life.world.id];
   // lives from before 2.10 have no money and were in won
   const base = c === LOCAL ? MONEY_UNIT[life.money] || MONEY_UNIT[MONEY.WON] : c || [N_('gold'), 1];
-  // a conversion on the player's word rescaled the money (life.scale)
-  return life && life.scale ? [base[0], life.scale] : base;
+  // a conversion rescaled the money (life.scale)
+  return [base[0], (life && life.scale) || base[1]];
 }
-// life.unit: a currency the narrator switched to on the player's word (only the label changes)
+// the narrator's own word (life.unit) is shown as written
+export const moneyUnit = (life, lang = uiLang()) => (life && life.unit) || tIn(lang, currencyOf(life)[0]);
 export function moneyText(n, life, lang = uiLang()) {
   return tIn(lang, '{amount} {unit}', {
     amount: Number(n || 0).toLocaleString(locale(lang)),
-    unit: (life && life.unit) || tIn(lang, currencyOf(life)[0]),
+    unit: moneyUnit(life, lang),
   });
 }
 export const BASE = {

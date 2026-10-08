@@ -310,6 +310,7 @@
   "won": "원",
   "yen": "엔",
   "Money: {from} → {to}": "소지금: {from} → {to}",
+  "Money: not converted": "소지금: 환전 안 됨",
   "dollars": "달러",
   "credits": "크레딧",
   "ration tickets": "배급표",

@@ -310,6 +310,7 @@
   "won": "ウォン",
   "yen": "円",
   "Money: {from} → {to}": "所持金：{from} → {to}",
+  "Money: not converted": "所持金：両替されず",
   "dollars": "ドル",
   "credits": "クレジット",
   "ration tickets": "配給券",

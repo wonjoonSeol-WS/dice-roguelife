@@ -427,8 +427,6 @@ function maskReply(out, cmd, turn) {
     out.reasons = {};
     out.memory = {};
     out.judge = cmd.type;
-    out.money_unit = null;
-    out.money_rate = null;
     out.also_present = [];
     out.level_ups = [];
     out.evolve_skills = [];
@@ -450,7 +448,6 @@ function maskReply(out, cmd, turn) {
     out.dead = false;
     out.murim = null;
     out.money_unit = null;
-    out.money_rate = null;
     if (out.clock) out.clock.days_passed = 0;
     if (out.memory) out.memory = { lore: out.memory.lore || [] };
   }

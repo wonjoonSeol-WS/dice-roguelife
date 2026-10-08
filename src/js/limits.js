@@ -13,6 +13,7 @@ export const LIMITS = {
     reason: 140, // why a stat moved
     statKey: 12, // the stat a reason belongs to
     energyName: 10, // the power pool's own word (기, 마나, 오러)
+    moneyUnit: 24, // a currency the player switched to (금화, Australian dollars)
   },
   perReply: {
     system: 4, // system lines
@@ -46,5 +47,6 @@ export const LIMITS = {
   move: {
     days: 3650, // days that may pass in one reply
     neigong: 120, // years of inner power gained or lost in one reply
+    moneyRate: 1e6, // a currency conversion, new units per old, both ways (dollars to dong: 25,000)
   },
 };
