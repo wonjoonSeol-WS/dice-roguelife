@@ -1,13 +1,13 @@
 /* ============ images view ============ */
-import { $, esc, noteIgnored, nowIso, sha256Hex, toast } from './util.js';
+import { $, esc, inParallel, noteIgnored, nowIso, sha256Hex, toast } from './util.js';
 import { EMOS, WORLDS } from './data.js';
 import { platform } from './db.js';
 import { app } from './app.js';
 import { saveSettings } from './settings.js';
 import { logErr } from './diag.js';
 import { answerDialog, askConfirm, askPrompt, askReview, openDialog, openSheet } from './sheet.js';
-import { findManifestAsset, IMGDOC, imgError, IMGX, restoreFromManifest, SETDOC } from './library.js';
-import { charSetsAll, genderOf, imgUrl, setCover, setWorlds, worldChips, worldsOf } from './images.js';
+import { fillHashes, findManifestAsset, IMGDOC, imgError, IMGX, restoreFromManifest, SETDOC } from './library.js';
+import { charSetsAll, genderOf, imgById, imgUrl, setCover, setWorlds, worldChips, worldsOf } from './images.js';
 import { capTags, isGeneric, isIdTag, setIds, setTier, TIERS_CAST, toEnglishTags } from './casting.js';
 import { exportPack } from './images-export.js';
 import { setStat, statText } from './stat.js';
@@ -676,14 +676,6 @@ async function exclusiveJob(name, job) {
     busy = '';
   }
 }
-// run fn over items, a few at a time
-async function inParallel(items, n, fn) {
-  const queue = [...items];
-  const worker = async () => {
-    while (queue.length) await fn(queue.shift());
-  };
-  await Promise.all(Array.from({ length: Math.min(n, queue.length) }, worker));
-}
 const UPLOAD_PAR = 3; // pictures sent at the same time (it drops to 1 when uploads start failing, and climbs back)
 const UPLOAD_RETRIES = 2;
 const MAX_UNSAVED = 9; // pictures sent but not yet in the saved list: the most a closed window could lose
@@ -1269,6 +1261,8 @@ export async function importTags(file) {
           .filter(Boolean)
           .slice(0, 6);
         if (al.length) meta.aliases = al;
+        const cover = m.cover && findImg(String(m.cover));
+        if (cover && (cover.set || cover.name) === k) meta.cover = cover.id;
         app.setMeta[k] = Object.assign({}, app.setMeta[k] || {}, meta);
         try {
           await SETDOC(k).set(app.setMeta[k]);
@@ -1397,18 +1391,7 @@ async function wipeAllImagesInner() {
   renderImages();
 }
 async function saveManifest() {
-  let n = 0;
-  for (const x of app.images) {
-    if (!x.shash) {
-      setStat(T('Computing hashes {i}', { i: ++n }));
-      try {
-        x.shash = await sha256Hex(await (await fetch(imgUrl(x.id))).blob());
-        await IMGDOC(x.id).set(x);
-      } catch (e) {
-        noteIgnored('image hash backfill', e);
-      }
-    }
-  }
+  await fillHashes(setStat, T('Scanning')).catch(e => noteIgnored('save list: keep hashes', e));
   const items = app.images.map(x => ({
     shash: x.shash,
     hash: x.hash,
@@ -1422,7 +1405,14 @@ async function saveManifest() {
     world: x.world || 'any',
     variant: x.variant || '',
   }));
-  const data = { kind: 'dice-roguelife-manifest', v: 1, createdAt: nowIso(), items, sets: app.setMeta };
+  // a cover is an id, which a copy doesn't share, so it goes by its file's hash
+  const sets = Object.fromEntries(
+    Object.entries(app.setMeta).map(([k, m]) => [
+      k,
+      m.cover ? Object.assign({}, m, { cover: (imgById(m.cover) || {}).shash }) : m,
+    ]),
+  );
+  const data = { kind: 'dice-roguelife-manifest', v: 1, createdAt: nowIso(), items, sets };
   try {
     const old = await findManifestAsset();
     const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
@@ -1489,21 +1479,6 @@ async function recoverImages() {
   setStat('');
   toast(T('Recovered {n} {n|image|images}. Tag them with Auto-sort', { n }));
   renderImages();
-}
-// the hash of each stored file: a row saved by an older version has none, and the skip check and the dedupe need it
-async function fillHashes(say, label) {
-  const todo = app.images.filter(x => !x.shash);
-  let n = 0;
-  for (const x of todo) {
-    say(`${++n}/${todo.length} ${label}`);
-    try {
-      x.shash = await sha256Hex(await (await fetch(imgUrl(x.id))).blob());
-    } catch (e) {
-      noteIgnored('image hash backfill', e);
-    }
-  }
-  const ok = todo.filter(x => x.shash).map(x => x.id);
-  if (ok.length) await IMGX.flush(ok, (i, t) => say(T('Saving {i}/{n}', { i, n: t })));
 }
 const imgLabel = x => (x.file && x.file !== x.name ? `${x.name} [${x.file}]` : x.name || x.file || x.id);
 const byOldest = (a, b) => String(a.createdAt || '').localeCompare(String(b.createdAt || ''));

@@ -1,11 +1,11 @@
 /* ============ image library: index, set cards ============ */
-import { noteIgnored, nowIso, sha256Hex, toast } from './util.js';
+import { inParallel, noteIgnored, nowIso, sha256Hex, toast } from './util.js';
 import { WORLD_ALIAS } from './data.js';
 import { dget, dset, isPrivileged, platform, thaw, userCol } from './db.js';
 import { app } from './app.js';
 import { saveSettings } from './settings.js';
 import { logErr } from './diag.js';
-import { imgUrl } from './images.js';
+import { imagesChanged, imgUrl, picIds, picKeys, turnImg, turnKeys } from './images.js';
 import { T } from './i18n.js';
 
 export let imgError = '';
@@ -42,7 +42,7 @@ export const IMGX = {
     return rs;
   },
   async write(p, extra, skip) {
-    this.ver = (this.ver || 0) + 1;
+    imagesChanged();
     const rs = this.rows(p, extra, skip);
     if (!rs.length) {
       await this.ref(p)
@@ -129,15 +129,10 @@ export const IMGX = {
     for (const id of ids) this.assign(id);
     const ps = [...new Set(ids.map(id => this.map.get(id)))];
     let n = 0;
-    const queue = [...ps];
-    const worker = async () => {
-      while (queue.length) {
-        const p = queue.shift();
-        onStat && onStat(++n, ps.length);
-        await this.save(p);
-      }
-    };
-    await Promise.all(Array.from({ length: Math.min(3, ps.length) }, worker));
+    await inParallel(ps, 3, p => {
+      onStat && onStat(++n, ps.length);
+      return this.save(p);
+    });
   },
   // Take pictures out of the list (they must already be gone from app.images): one write per page, pages side by side.
   async dropMany(ids) {
@@ -406,11 +401,50 @@ export async function restoreFromManifest(m, onProgress = () => {}) {
     }
   }
   for (const [k, v] of Object.entries(m.sets || {})) {
-    app.setMeta[k] = v;
+    const cover = v.cover && app.images.find(x => x.shash === v.cover);
+    app.setMeta[k] = cover ? Object.assign({}, v, { cover: cover.id }) : v;
     await SETDOC(k)
-      .set(v)
+      .set(app.setMeta[k])
       .catch(e => noteIgnored('images-view: SETDOC.set', e));
   }
   onProgress('');
   return hit;
+}
+// the hash of each stored file (a row saved by an older version has none); save: write them into the list
+export async function fillHashes(say, label, rows = app.images, save = true) {
+  const todo = rows.filter(x => !x.shash);
+  let n = 0;
+  await inParallel(todo, 6, async x => {
+    say(`${++n}/${todo.length} ${label}`);
+    try {
+      x.shash = await sha256Hex(await (await fetch(imgUrl(x.id))).blob());
+    } catch (e) {
+      noteIgnored('image hash backfill', e);
+    }
+  });
+  imagesChanged();
+  const ok = todo.filter(x => x.shash).map(x => x.id);
+  if (save && ok.length) await IMGX.flush(ok, (i, t) => say(T('Saving {i}/{n}', { i, n: t })));
+}
+const KEYS_PER_PICTURE = 4; // this install's two first, then the ones it came with
+// the turns as a save file carries them: each img with its pictures' content keys by id (ARCHITECTURE.md)
+export async function withPicKeys(turns, say) {
+  if (imgError)
+    toast(T("The image list didn't load, so this file can't bring its pictures along. Reload and export again."), 6000);
+  const used = new Set(turns.flatMap(t => (t.img ? picIds(t.img).map(id => turnImg(t.img, id)) : [])).filter(Boolean));
+  // only the owner writes the shared list, the way it was loaded; anyone else keeps the hashes for this file only
+  await fillHashes(say, T('Preparing the save file'), [...used], await isPrivileged()).catch(e =>
+    noteIgnored('save file: keep hashes', e),
+  );
+  return turns.map(t => {
+    if (!t.img) return t;
+    const img = Object.assign({}, t.img);
+    delete img.keys;
+    for (const id of new Set(picIds(t.img))) {
+      // the keys it came with stay: another install may hold only the files they match
+      const k = [...new Set([...picKeys(turnImg(t.img, id) || {}), ...turnKeys(t.img, id)])].slice(0, KEYS_PER_PICTURE);
+      if (k.length) (img.keys = img.keys || {})[id] = k;
+    }
+    return Object.assign({}, t, { img });
+  });
 }

@@ -19,7 +19,7 @@ import {
   sysTag,
   titleGained,
 } from './reply-words.js';
-import { charSetsAll, imgById, imgUrl, sceneHtml, turnPeople } from './images.js';
+import { charSetsAll, imgById, imgUrl, sceneHtml, turnImg, turnPeople } from './images.js';
 import { startNewLifeForm } from './new-life.js';
 import { loadEarlier, pushTurn } from './persistence.js';
 import { changeFaceIn } from './face-picker.js';
@@ -139,7 +139,7 @@ const fmtText = h =>
 function narrHtml(text) {
   return fmtText(inlineSys(esc(stripMarks(text))).h);
 }
-function narrWithImages(o, ti, people) {
+function narrWithImages(o, ti, people, sc) {
   // put portraits and scene changes where the narrator marked them
   const used = new Set();
   let h = esc(String(o.narration || '').replace(/\n*(\[\[[^\[\]\n]{1,32}\]\])\n*/g, '$1'));
@@ -152,8 +152,8 @@ function narrWithImages(o, ti, people) {
     name = name.trim();
     if (at) {
       const pl = places.find(x => x.name === name);
-      const x = pl && imgById(pl.id);
-      if (!x || used.has('@' + name) || x.id === ti.scene) return '';
+      const x = pl && turnImg(ti, pl.id);
+      if (!x || used.has('@' + name) || x === sc) return '';
       used.add('@' + name);
       return `\u0000<div class="scene inl" style="background-image:url('${imgUrl(x.id)}')"></div>\u0000`;
     }
@@ -424,11 +424,11 @@ function renderTurnInner(t, isLast) {
   if (t.kind === 'system') return `<p class="sysline">${esc(t.text)}</p>`;
   if (t.kind === 'ledger') return `<div class="turn">${ledgerCard(t.out, t.i)}</div>`;
   const o = t.out || {};
-  const ti = t.img || { scene: o.scene_img, char: o.char_img };
+  const ti = t.img || {};
   let img = '';
-  const sc = imgById(ti.scene);
+  const sc = turnImg(ti, ti.scene);
   const ppl = turnPeople(ti, o);
-  const NW = narrWithImages(o, ti, ppl);
+  const NW = narrWithImages(o, ti, ppl, sc);
   const rest = ppl.filter(p => !NW.used.has(p.npc));
   if (sc || rest.length) img = sceneHtml(sc, rest);
   const RS = o.reasons || {};

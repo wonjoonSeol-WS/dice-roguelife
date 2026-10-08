@@ -20,7 +20,7 @@ import { logErr } from './diag.js';
 import { askConfirm, askPrompt, closeSheet, openSheet } from './sheet.js';
 import { showTab } from './shell.js';
 import { loadSaves, useCapability } from './boot.js';
-import { IMGX } from './library.js';
+import { IMGX, withPicKeys } from './library.js';
 import { imgUrl } from './images.js';
 import { startNewLifeForm } from './new-life.js';
 import { closeGone, openSave } from './persistence.js';
@@ -155,7 +155,7 @@ export async function exportSaveFile(id) {
       exportedAt: nowIso(),
       save: meta,
       state,
-      turns: all,
+      turns: await withPicKeys(all, say),
     };
     const raw = await gzipBytes(file);
     if (!raw) {

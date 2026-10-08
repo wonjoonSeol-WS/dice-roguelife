@@ -65,8 +65,8 @@
 | `people.js` | 인물: 별칭 정리(`canonName`, `aliasOut`), 이름 합치기(`renamePerson`), 최근 관계(`activeRel`), 등장 기록(`markSeen`) |
 | `compat.js` | 옛 저장을 지금 형식으로(`compat`) |
 | **이미지와 캐스팅** | |
-| `library.js` | 이미지 색인(`IMGX`, 공유 `imgidx` 문서), 세트 카드, 매니페스트 복원, 옛 구조 이전 |
-| `images.js` | 이미지 찾기: `imgById`, 캐릭터 세트(`charSets`), 세계 맞춤(`fitsWorld`, `setWorlds`), 표정 고르기(`pickEmotion`), 장면 HTML |
+| `library.js` | 이미지 색인(`IMGX`, 공유 `imgidx` 문서), 세트 카드, 매니페스트 복원, 옛 구조 이전, 파일 해시(`fillHashes`), 저장 파일의 그림 키(`withPicKeys`) |
+| `images.js` | 이미지 찾기: `imgById`(id 색인), 턴의 그림(`turnImg`: 내용 키, 그다음 id), 캐릭터 세트(`charSets`), 세계 맞춤(`fitsWorld`, `setWorlds`), 표정 고르기(`pickEmotion`), 장면 HTML |
 | `places.js` | 배경 검색: 내레이터가 영어 단어로 묘사한 장소 → 배경 이미지(`findPlace`) |
 | `casting.js` | 캐스팅: 인물(`{ name, gender, role, weight, look }`, 답에서는 `speakerOf`, `presentOf`)에게 초상화 세트 배정(외모, 역할, 소속 태그 점수), AI 선택, 그림자. 성별이 있는 인물에게는 `기타` 세트를 자동으로 주지 않습니다(얼굴 고르기 창에서는 고를 수 있음). |
 | `widgets.js` | 위젯 레지스트리 `WIDGETS`: 뉴스, 의뢰 게시판, 커뮤니티, 메신저마다 렌더, 접기 라벨, 후속 버튼, 마크다운 내보내기. 새 위젯은 항목 하나와 `prompts.json`의 스키마로 추가합니다. 게시판과 메신저는 생김새가 여럿(`BOARDS`: DC, 레딧, 5ch, 니코니코 / `CHATS`: 카카오톡, 왓츠앱, 라인)이고 데이터는 같아요. 설정 `boardStyle`, `chatStyle`, 자동이면 이야기 언어로 (`settings.js` `widgetStyle`). |
@@ -284,6 +284,19 @@ localStorage만 씁니다: `dr:inputHint`(입력 요령 안내), `dr:choiceHint`
 - 바깥 봉투: `{app: 'dice-roguelife', format: 3, n, d}`. `d`는 안쪽 내용을 gzip한 뒤 Z85로 인코딩한 문자열입니다.
 - 안쪽: `{app, format: 1, appVersion: 'Dice Roguelife, v<버전>', exportedAt, save, state, turns}`. 이미지는 넣지 않습니다.
 - 가져오기는 새 id와 " (가져옴)" 이름으로 새 저장을 만들고, 턴을 다시 묶어 페이지, 상태, 카드 순서로 씁니다.
+- 그림 id는 설치(아티팩트, 단독 실행판)마다 새로 매겨지므로, 파일에 담는 턴에는 `img.keys`(그 턴의 그림 id → 내용 키)를
+  붙입니다(`withPicKeys`). 내용 키는 저장된 파일과 처음 올린 파일의 SHA-256 앞 16자(`picKeys`: `shash`, `hash`)입니다.
+  이미지 팩은 저장된 파일을 그대로 담으므로, 다른 설치에서 팩을 올리면 그 `hash`가 이쪽의 `shash`와 같습니다. 같은 원본을
+  올려도 `hash`가 같습니다. 이 설치의 턴 줄은 바꾸지 않습니다.
+- 다시 내보낼 때는 이쪽 그림의 키에 그 턴이 가져온 키를 더합니다. 그래서 A → B → C로 옮겨도, 이쪽에 없는 그림이나 다른 바이트로
+  저장된 그림의 키가 사라지지 않습니다. 그림마다 키는 많아야 4개(이쪽 것 먼저)입니다. 해시가 없는 옛 행은 내보낼 때 해시를
+  채우는데(`fillHashes`), 공유 목록에 저장하는 것은 주인뿐입니다. 이미지 목록을 불러오지 못한 채 내보내면 알려 줍니다.
+- 턴의 그림은 `turnImg`가 내용 키, id, `dupMap` 순서로 찾습니다(`imgById`, 목록을 쓸 때마다 올라가는 `imagesVer`로 다시
+  만드는 색인, 캐스팅의 메모도 같은 숫자를 봅니다). 키가 있는데 하나도 맞지 않으면, 같은 id라도 해시가 있는 행은 다른 그림으로
+  보고 보여주지 않습니다. 중복 정리로 옮겨 간 id(`dupMap`)는 같은 그림이므로 그대로 따라갑니다. 키가 없는 옛 저장은 지금처럼
+  id로만 찾습니다. 가장 옛 턴은 그림을 `out.scene_img`, `out.char_img`에 두었는데, 불러올 때(`inflate`) `img`로 옮깁니다.
+- 세트 표지(`setMeta.cover`)는 id라서 이미지 팩의 `tags.json`에는 표지 그림의 파일 이름(`cover`)으로, 사본용 목록(매니페스트)에는
+  그 파일의 `shash`로 담습니다.
 
 ### 이미지 라이브러리
 

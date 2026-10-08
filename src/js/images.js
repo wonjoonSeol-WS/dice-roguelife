@@ -20,13 +20,52 @@ export function turnPeople(ti, o) {
   // [{x,npc}] for a turn, main speaker first; older turns only have img.char
   const list =
     Array.isArray(ti.chars) && ti.chars.length ? ti.chars : ti.char ? [{ id: ti.char, npc: o.speaker || '' }] : [];
-  return list.map(c => ({ x: imgById(c.id), npc: canonName(c.npc || ''), hidden: !!c.hidden })).filter(p => p.x);
+  return list.map(c => ({ x: turnImg(ti, c.id), npc: canonName(c.npc || ''), hidden: !!c.hidden })).filter(p => p.x);
+}
+// a picture's content keys (ARCHITECTURE.md, 저장 파일 내보내기)
+export const picKeys = x => [
+  ...new Set([x.shash, x.hash].filter(h => typeof h === 'string' && h).map(h => h.slice(0, 16))),
+];
+// bumped on every write of the list (library.js), since rows also change in place; what is built from the list keys on it
+let ver = 0;
+export const imagesChanged = () => ver++;
+export const imagesVer = () => ver;
+let IX = null;
+function imgIndex() {
+  const list = app.images;
+  if (IX && IX.list === list && IX.n === list.length && IX.ver === ver) return IX;
+  IX = { list, n: list.length, ver, id: new Map(), key: new Map() };
+  for (const x of list) {
+    if (!IX.id.has(x.id)) IX.id.set(x.id, x);
+    for (const k of picKeys(x)) if (!IX.key.has(k)) IX.key.set(k, x);
+  }
+  return IX;
 }
 export function imgById(id) {
   if (!id) return null;
+  const ix = imgIndex();
   const m = (app.settings.dupMap || {})[id];
-  return app.images.find(x => x.id === id) || (m ? app.images.find(x => x.id === m) : null);
+  return ix.id.get(id) || (m && ix.id.get(m)) || null;
 }
+// the content keys a turn from another install carries for one of its picture ids
+export const turnKeys = (ti, id) => {
+  const k = ti && ti.keys && ti.keys[id];
+  return Array.isArray(k) ? k : [];
+};
+// a picture a turn names (ti: the turn's img): by content key first, then by id
+export function turnImg(ti, id) {
+  const keys = turnKeys(ti, id);
+  if (!keys.length) return imgById(id);
+  const ix = imgIndex();
+  for (const k of keys) if (ix.key.has(k)) return ix.key.get(k);
+  const x = ix.id.get(id);
+  // no key matched, so a hashed row under this id is another picture; a dedupe redirect is the same picture
+  if (x) return x.shash || x.hash ? null : x;
+  return imgById(id);
+}
+const listOf = v => (Array.isArray(v) ? v.filter(Boolean) : []);
+export const picIds = ti =>
+  [ti.scene, ti.char, ...listOf(ti.chars).map(c => c.id), ...listOf(ti.places).map(p => p.id)].filter(Boolean);
 export function setCover(k, imgs) {
   imgs = imgs || charSetsAll()[k] || [];
   const c = (app.setMeta[k] || {}).cover;
