@@ -807,7 +807,7 @@ db、sample、user、assets、downloads、artifact の機能をオンにして�
         <li><b>1セットが1人です。</b>表情によって、そのセットの中から場面に合う顔を選びます。</li>
         <li>AIが各人物の性別、役割、重要度、見た目の言葉、所属を説明します。</li>
         <li>コードがそれを各セットの<b>タグ、役割、雰囲気</b>と単語ごとに照らし合わせて点数をつけます。</li>
-        <li><code>faction:Silver Knights</code> のような<b>所属タグ</b>が一致すると大きく加点されます。</li>
+        <li><code>faction:新選組</code> のような<b>所属タグ</b>が一致すると大きく加点されます。</li>
         <li>世界と性別が合うセットだけが候補です。多くのセットに共通する言葉（髪、笑顔）は数えません。</li>
         <li>重要度（ティア）が近いことも加点されます。ティアは extra、minor、major です。</li>
         <li>一度選ばれた顔は、その人生のあいだずっとその人物に使われます。</li>
@@ -899,7 +899,7 @@ db、sample、user、assets、downloads、artifact の機能をオンにして�
     <li><b>sets</b>：gender（male/female/other）、worlds、role、vibe、look、tier（extra/minor/major）、tags、name、aliases、cover（表紙にする画像のファイル名）</li>
     <li><b>images</b>：ファイル名ごとの emotion、tags、worlds</li>
     <li><b>backgrounds</b>：ファイル名ごとの place、time、mood、tags、worlds</li>
-    <li>タグ：小文字の英語で説明タグを3〜6個。固有名詞だけは元の言語のままです。所属タグは <code>key:value</code> の形です（例：<code>faction:Tang Clan</code>）。</li>
+    <li>タグ：小文字の英語で説明タグを3〜6個。固有名詞は英語以外（日本語など）でもかまいません。所属タグは <code>key:value</code> の形です（例：<code>faction:新選組</code>）。</li>
   </ul>
 
   <h3 lang="ko">팩 내보내기</h3><h3 lang="en">Export pack</h3><h3 lang="ja">パックを書き出し</h3>
@@ -1113,8 +1113,8 @@ hunter, apoc, academy, tower, vrmmo, fantasy, rofan, murim, palace, cyber, monst
 
 タグ
 - 説明タグ：小文字の英語で3〜6個（髪、衣装、小物、雰囲気。背景なら場所、時間帯、天気、雰囲気）。
-- 所属タグ（任意）：key:value。key は英語、value は元の言語のままの固有名詞
-  例：faction:Tang Clan
+- 所属タグ（任意）：key:value。key は英語、value は固有名詞で、元の言語のまま（日本語でもかまいません）
+  例：faction:新選組
 - 元の言語のままにするのは固有名詞だけで、それ以外はすべて英語です。
 
 tags.json（キーは新しいファイル名）
