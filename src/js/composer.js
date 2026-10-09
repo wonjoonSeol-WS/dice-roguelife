@@ -142,14 +142,15 @@ export function restoreDraft() {
   }
 }
 let draftT = null;
+// a Japanese IME types the slash as "／" or, in kana mode, "・", and letters full width
+const cmdWord = w => w.normalize('NFKC').replace(/^・/, '/').toLowerCase();
 function slashMenu() {
-  const v = input.value,
+  const lv = cmdWord(input.value),
     box = $('#slash');
-  if (!v.startsWith('/') || v.includes(' ')) {
+  if (!lv.startsWith('/') || /\s/.test(lv)) {
     box.classList.add('hidden');
     return;
   }
-  const lv = v.toLowerCase();
   const m = CMDS.filter(c => allCmdNames(c).some(k => k.startsWith(lv)));
   if (!m.length) {
     box.classList.add('hidden');
@@ -178,16 +179,14 @@ function slashMenu() {
   );
 }
 export function parseCmd(text) {
-  const t = text.trim();
-  for (const c of CMDS)
-    for (const k of allCmdNames(c)) {
-      if (t.toLowerCase() === k || t.toLowerCase().startsWith(k + ' '))
-        return {
-          type: c.t,
-          id: c.id,
-          arg: [c.preset && pl(c.preset), t.slice(k.length).trim()].filter(Boolean).join(' '),
-          ...(c.look ? { look: c.look } : {}),
-        };
-    }
-  return null;
+  const [, word, rest] = text.trim().match(/^(\S+)\s*([\s\S]*)$/) || [];
+  const w = word && cmdWord(word);
+  const c = w && CMDS.find(c => allCmdNames(c).includes(w));
+  if (!c) return null;
+  return {
+    type: c.t,
+    id: c.id,
+    arg: [c.preset && pl(c.preset), rest].filter(Boolean).join(' '),
+    ...(c.look ? { look: c.look } : {}),
+  };
 }

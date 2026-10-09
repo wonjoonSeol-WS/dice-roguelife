@@ -3,17 +3,17 @@
   "inputs": {
     "look": "周りを見回す",
     "walk": "歩き続ける",
-    "judgeTyping": "/wh",
-    "judge": "/why さっきの判定の根拠を教えて",
-    "chat": "/chat 今夜ラーメンどう？",
-    "chatAgain": "/chat やあ",
-    "board": "/board",
-    "news": "/news",
-    "quest": "/quest",
-    "star": "/star",
+    "judgeTyping": "/判",
+    "judge": "/判定 さっきの判定の根拠を教えて",
+    "chat": "/チャット 今夜ラーメンどう？",
+    "chatAgain": "/チャット やあ",
+    "board": "/掲示板",
+    "news": "/ニュース",
+    "quest": "/依頼",
+    "star": "/星座",
     "hero": "地図を買ってくれる人を探す",
     "heroBoard": "/5ch",
-    "heroChat": "/chat ミラ、いる？"
+    "heroChat": "/チャット ミラ、いる？"
   },
   "free": {
     "origin": "コンビニの夜勤バイト",
