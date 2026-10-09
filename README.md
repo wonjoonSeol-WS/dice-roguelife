@@ -184,7 +184,7 @@ Ship it as a single claude.ai artifact. The artifact provides Claude calls (`sam
 | Trade-off | How to deal with it |
 | --- | --- |
 | **Limited storage** (it fills up after long play) | When full, nothing new is saved. In the Saves tab, **export old saves, then delete them** to free space. |
-| **Safety filters are stricter than the API's** | Jailbreak-style experiences aren't possible. **For adult content, keep using services like Crack.** |
+| **Safety filters are stricter than the API's** | Jailbreak-style experiences aren't possible. **For adult content, use services like Crack, or the [standalone](#optional-standalone-for-developers) with a local model.** |
 | Saves are tied to the artifact | Always update by overwriting the same link. |
 | Images are separate for each artifact | Upload them again in the Images tab, or move them with `Export pack`. |
 | Anthropic sets the usage limits | I can't change them. Sending less recent story helps. |
