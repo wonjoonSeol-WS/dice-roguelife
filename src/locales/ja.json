@@ -1063,5 +1063,15 @@
   "Community board, always in Reddit style": "コミュニティ掲示板（常にReddit風）",
   "Community board, always in 5ch style": "コミュニティ掲示板（常に5ch風）",
   "Community board, always in DC Inside style": "コミュニティ掲示板（常にDCインサイド風）",
-  "Community board, always in Niconico style (comments fly across the video)": "コミュニティ掲示板（常にニコニコ風、コメントが動画の上を流れる）"
+  "Community board, always in Niconico style (comments fly across the video)": "コミュニティ掲示板（常にニコニコ風、コメントが動画の上を流れる）",
+  "/news|command": "/ニュース",
+  "/quest|command": "/依頼 /クエスト",
+  "/board|command": "/掲示板",
+  "/reddit|command": "/レディット",
+  "/nico|command": "/ニコニコ /ニコ",
+  "/star|command": "/星座",
+  "/chat|command": "/チャット /トーク",
+  "/why|command": "/判定 /なぜ",
+  "/skill|command": "/スキル",
+  "/status|command": "/ステータス"
 }

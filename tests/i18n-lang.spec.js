@@ -1,6 +1,6 @@
 // An English or Japanese browser gets the game in its language: screens, a new life, the narrator's prompt.
 import { test, expect } from './support/test.js';
-import { check, claudeMock, startLife } from './support/harness.js';
+import { check, claudeMock, same, startLife } from './support/harness.js';
 
 const answer = (narration, choice, time) =>
   `async(p)=>{(window.__prompts=window.__prompts||[]).push(p);return {admin:'...',narration:${JSON.stringify(narration)},system:[],choices:[${JSON.stringify(choice)},'...'],stat_changes:{gold:10},reasons:{gold:'.'},clock:{days_passed:0,time:${JSON.stringify(time)}},memory:{},dead:false}}`;
@@ -96,6 +96,40 @@ for (const L of LANGS)
     );
     expect(errs).toEqual([]);
   });
+
+// a Japanese player types commands by their Japanese names, often with the IME still on ("／", "・", full width)
+test('japanese command names', async ({ game }) => {
+  const { pg, errs } = await game(claudeMock(LANGS[1].answer), { locale: 'ja-JP' });
+  await startLife(pg, { name: 'Jin' });
+  const typed = [
+    '/ニュース',
+    '／ニュース',
+    '・ニュース',
+    '／ｎｅｗｓ',
+    '/チャット　やあ',
+    '/news',
+    '・剣を抜く',
+    '/ニュース速報',
+  ];
+  const parsed = await pg.evaluate(
+    t => t.map(x => (c => c && c.id + (c.arg ? ':' + c.arg : ''))(DR.parseCmd(x))),
+    typed,
+  );
+  check(
+    errs,
+    `Japanese names and IME slashes parse: ${parsed}`,
+    same(parsed, ['news', 'news', 'news', 'news', 'chat:やあ', 'news', null, null]),
+  );
+  await pg.fill('#input', '／');
+  const menu = await pg.textContent('#slash');
+  check(errs, `the slash list shows the Japanese names: ${menu}`, menu.includes('/ニュース') && menu.includes('/依頼'));
+  await pg.fill('#input', '・ニュース');
+  await pg.press('#input', 'Enter');
+  await pg.waitForFunction('DR.isIdle()&&(window.__prompts||[]).length>=2', null, { timeout: 15000 });
+  const prompt = await pg.evaluate('window.__prompts.slice(-1)[0]');
+  check(errs, 'the narrator is asked for the news', prompt.includes('Always fill the news widget'));
+  expect(errs).toEqual([]);
+});
 
 test('returning korean player on an english browser stays korean', async ({ game }) => {
   const { pg, errs } = await game(
