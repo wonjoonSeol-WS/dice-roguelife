@@ -20,7 +20,7 @@ test('update sheet', async ({ game }) => {
   console.log('request:', text.replaceAll('\n', ' / '));
   for (const want of [
     '컴퓨터 도구(bash)',
-    'curl -L -o dice-roguelife.html https://github.com/wonjoonSeol-WS/dice-roguelife/releases/latest/download/dice-roguelife.html',
+    'curl -L -o dice-roguelife.html https://github.com/wonjoonSeol/dice-roguelife/releases/latest/download/dice-roguelife.html',
     '덮어써',
     '(여기에 내 아티팩트 링크)',
   ]) {

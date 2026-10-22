@@ -254,13 +254,13 @@ test('the update check: the newest release and its standalone zip, and nothing o
       latest: tag.slice(1),
       newer: true,
       // built here from the version, whatever the reply says
-      url: `https://github.com/wonjoonSeol-WS/dice-roguelife/releases/download/${tag}/${zip}`,
+      url: `https://github.com/wonjoonSeol/dice-roguelife/releases/download/${tag}/${zip}`,
       dataPath: s.dataDir,
     });
     reply = () => Response.json({ tag_name: 'v' + version, assets: [] });
     assert.equal((await check()).newer, false);
     reply = () => Response.json({ tag_name: tag, assets: [] }); // a release without the zip: its page
-    assert.equal((await check()).url, `https://github.com/wonjoonSeol-WS/dice-roguelife/releases/tag/${tag}`);
+    assert.equal((await check()).url, `https://github.com/wonjoonSeol/dice-roguelife/releases/tag/${tag}`);
     reply = () => {
       throw new TypeError('fetch failed');
     };

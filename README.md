@@ -3,14 +3,14 @@ English | [한국어](README.ko.md) | [日本語](README.ja.md)
 # Dice Roguelife - a roguelike AI chat game
 
 > ## 📖 The guide
-> **English: https://wonjoonseol-ws.github.io/dice-roguelife/** · **한국어: https://wonjoonseol-ws.github.io/dice-roguelife/?lang=ko** · **日本語: https://wonjoonseol-ws.github.io/dice-roguelife/?lang=ja**
+> **English: https://wonjoonseol.github.io/dice-roguelife/** · **한국어: https://wonjoonseol.github.io/dice-roguelife/?lang=ko** · **日本語: https://wonjoonseol.github.io/dice-roguelife/?lang=ja**
 > How to start, the dice modes and setting up images, with screenshots. Install and update steps are right below.
 
 > ## 🎁 Sample image pack (free assets)
 > Ready-to-use example files: **6 shadow images** and a tag file (3 characters with 9 images, 4 backgrounds).
-> **[Download sample-pack.zip](https://github.com/wonjoonSeol-WS/dice-roguelife/releases/download/free-pack-v1/sample-pack.zip)**
+> **[Download sample-pack.zip](https://github.com/wonjoonSeol/dice-roguelife/releases/download/free-pack-v1/sample-pack.zip)**
 >
-> Free assets are few, so **image contributions are welcome!** See "Image contributions welcome" on the [guide](https://wonjoonseol-ws.github.io/dice-roguelife/).
+> Free assets are few, so **image contributions are welcome!** See "Image contributions welcome" on the [guide](https://wonjoonseol.github.io/dice-roguelife/).
 
 A text roguelike where the dice decide your world, race, standing and talent, and Claude narrates that life in the style
 of a web novel. You type your character's lines and actions, and a d100 check rolls whenever the outcome could go either
@@ -49,7 +49,7 @@ Paste this into a new chat as is.
 ```
 Download the latest dice-roguelife.html from the link below and publish it as my artifact.
 It needs the db, sample, user, assets and downloads capabilities.
-https://github.com/wonjoonSeol-WS/dice-roguelife/releases/latest/download/dice-roguelife.html
+https://github.com/wonjoonSeol/dice-roguelife/releases/latest/download/dice-roguelife.html
 ```
 
 Open the published link and play. The first time it runs, Claude asks you to **confirm the connection**. **Tap OK** so the game can call Claude to write the story.
@@ -62,7 +62,7 @@ In the game, ⚙ Settings → **Check for updates** writes this prompt for you (
 
 ```
 Use the computer tool (bash) to download the file with the command below. Don't use web fetch.
-curl -L -o dice-roguelife.html https://github.com/wonjoonSeol-WS/dice-roguelife/releases/latest/download/dice-roguelife.html
+curl -L -o dice-roguelife.html https://github.com/wonjoonSeol/dice-roguelife/releases/latest/download/dice-roguelife.html
 Check that the file is an HTML file of a few hundred KB, then overwrite my artifact at the link below instead of creating a new one.
 Set its capabilities to db, sample, user, assets, downloads and artifact.
 My artifact: (paste your artifact link here)
@@ -74,7 +74,7 @@ My artifact: (paste your artifact link here)
 
 ```
 Use the computer tool (bash) to download the file with the command below. Don't use web fetch; GitHub blocks it.
-curl -L -o dice-roguelife.html https://github.com/wonjoonSeol-WS/dice-roguelife/releases/latest/download/dice-roguelife.html
+curl -L -o dice-roguelife.html https://github.com/wonjoonSeol/dice-roguelife/releases/latest/download/dice-roguelife.html
 Check that the file is an HTML file of a few hundred KB (not an error message),
 then publish it as my artifact with the db, sample, user, assets, downloads and artifact capabilities turned on.
 ```
@@ -229,7 +229,7 @@ npm run release -- 2.5.0   # bump the version, check, test, package
 
 The artifact is the way to play. For people who would rather run the game on their own computer with an API key or a
 local model (Ollama, LM Studio and others), there is a community-maintained add-on in [standalone/](standalone/README.md):
-download `dice-roguelife-standalone-v….zip` from the [latest release](https://github.com/wonjoonSeol-WS/dice-roguelife/releases/latest), unzip it and run `npm start` (Node.js
+download `dice-roguelife-standalone-v….zip` from the [latest release](https://github.com/wonjoonSeol/dice-roguelife/releases/latest), unzip it and run `npm start` (Node.js
 22.13 or later, nothing to install). It is a separate download: the artifact page is still `dice-roguelife.html`, and
 the artifact build doesn't include the add-on. To play on your phone as well, reach your computer through Tailscale
 (see that README).
@@ -240,4 +240,4 @@ the artifact build doesn't include the add-on. To play on your phone as well, re
 
 ## Try my other projects
 
-Like this? I make other small open source tools too: Android apps, a Claude chat game, Claude add-ons and more. See them all at [wonjoonseol-ws.github.io](https://wonjoonseol-ws.github.io/?from=dice-roguelife).
+Like this? I make other small open source tools too: Android apps, a Claude chat game, Claude add-ons and more. See them all at [wonjoonseol.github.io](https://wonjoonseol.github.io/?from=dice-roguelife).

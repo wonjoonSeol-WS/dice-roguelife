@@ -7,7 +7,7 @@ import { T } from './i18n.js';
 
 // The artifact's CSP blocks GitHub, so the player pastes a request into a new Claude chat. It must overwrite this same
 // artifact (saves live in its database) and fetch with curl (GitHub blocks Claude's web reader).
-const GUIDE_URL = 'https://wonjoonseol-ws.github.io/dice-roguelife/#install';
+const GUIDE_URL = 'https://wonjoonseol.github.io/dice-roguelife/#install';
 function updateRequestText(link) {
   return [
     T('Use your computer tool (bash) to download the file with the command below. Do not use web fetch.'),

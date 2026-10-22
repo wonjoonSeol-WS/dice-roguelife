@@ -1,7 +1,7 @@
 /* ============ app identity ============ */
 
 export const APP_VERSION = __APP_VERSION__; // package.json "version", set by the bundler (tools/bundle.mjs)
-export const REPO_URL = 'https://github.com/wonjoonSeol-WS/dice-roguelife'; // fixed here, never taken from anywhere remote
+export const REPO_URL = 'https://github.com/wonjoonSeol/dice-roguelife'; // fixed here, never taken from anywhere remote
 export const RELEASES_URL = REPO_URL + '/releases';
 
 /* ============ app state ============ */

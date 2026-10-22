@@ -9,7 +9,7 @@ export async function buildPage(ver) {
     if (e.code !== 'ERR_MODULE_NOT_FOUND') throw e;
     throw new Error(
       'This is the source code, which needs `npm ci` before `npm start`. To just play, download ' +
-        'dice-roguelife-standalone-v….zip from https://github.com/wonjoonSeol-WS/dice-roguelife/releases/latest',
+        'dice-roguelife-standalone-v….zip from https://github.com/wonjoonSeol/dice-roguelife/releases/latest',
     );
   });
   const css = readFileSync(new URL('client/standalone.css', import.meta.url), 'utf8');

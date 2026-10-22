@@ -176,7 +176,7 @@
           log('external script (jsdelivr)', false, e.message);
         }
         try {
-          const r = await fetch('https://wonjoonseol-ws.github.io/dice-roguelife/images/play-en.png');
+          const r = await fetch('https://wonjoonseol.github.io/dice-roguelife/images/play-en.png');
           log('fetch from GitHub Pages', r.ok, `HTTP ${r.status}, ${(await r.blob()).size} bytes`);
         } catch (e) {
           log('fetch from GitHub Pages', false, e.message);

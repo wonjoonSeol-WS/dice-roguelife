@@ -3,14 +3,14 @@
 # 주사위가 정한 인생 (Dice Roguelife) - 로그라이크 AI 채팅 게임
 
 > ## 📖 사용법은 가이드 사이트에서 보세요
-> **https://wonjoonseol-ws.github.io/dice-roguelife/?lang=ko** (English: https://wonjoonseol-ws.github.io/dice-roguelife/ · 日本語: https://wonjoonseol-ws.github.io/dice-roguelife/?lang=ja)
+> **https://wonjoonseol.github.io/dice-roguelife/?lang=ko** (English: https://wonjoonseol.github.io/dice-roguelife/ · 日本語: https://wonjoonseol.github.io/dice-roguelife/?lang=ja)
 > 화면 캡처와 함께 시작하는 법, 주사위 모드, 이미지 설정 방법을 설명해요. 설치와 업데이트 방법은 바로 아래에 있어요.
 
 > ## 🎁 샘플 이미지 팩 (무료 에셋)
 > 바로 쓸 수 있는 예제 파일이에요. **그림자 이미지 6장**과 태그 파일(캐릭터 3명 9장, 배경 4장)이 들어 있어요.
-> **[sample-pack.zip 받기](https://github.com/wonjoonSeol-WS/dice-roguelife/releases/download/free-pack-v1/sample-pack.zip)**
+> **[sample-pack.zip 받기](https://github.com/wonjoonSeol/dice-roguelife/releases/download/free-pack-v1/sample-pack.zip)**
 >
-> 무료 에셋이라 수가 많지 않아요. **이미지 기여는 환영합니다!** 방법은 [가이드 사이트](https://wonjoonseol-ws.github.io/dice-roguelife/?lang=ko)의 "이미지 기여 환영"을 봐 주세요.
+> 무료 에셋이라 수가 많지 않아요. **이미지 기여는 환영합니다!** 방법은 [가이드 사이트](https://wonjoonseol.github.io/dice-roguelife/?lang=ko)의 "이미지 기여 환영"을 봐 주세요.
 
 세계, 종족, 신분, 재능을 주사위가 정하고, Claude가 웹소설 문체로 그 삶을 서술하는 텍스트 로그라이크입니다. 화면은
 한국어, 영어, 일본어를 지원하고(브라우저 언어로 시작, ⚙ → 화면 언어에서 변경), 이야기 언어는 저장마다 시작할 때의
@@ -46,7 +46,7 @@
 ```
 아래 링크의 최신 버전 dice-roguelife.html 파일을 받아서, 내 아티팩트로 게시해 줘.
 db, sample, user, assets, downloads 기능이 모두 필요해.
-https://github.com/wonjoonSeol-WS/dice-roguelife/releases/latest/download/dice-roguelife.html
+https://github.com/wonjoonSeol/dice-roguelife/releases/latest/download/dice-roguelife.html
 ```
 
 게시된 링크를 열면 바로 플레이할 수 있어요. 처음 실행할 때 **Claude 연결 확인 창**이 떠요. **확인(OK)을 눌러야** 게임이 Claude를 불러 이야기를 쓸 수 있어요.
@@ -59,7 +59,7 @@ https://github.com/wonjoonSeol-WS/dice-roguelife/releases/latest/download/dice-r
 
 ```
 컴퓨터 도구(bash)에서 아래 명령으로 파일을 받아 줘. 웹 읽기(web fetch)는 쓰지 마.
-curl -L -o dice-roguelife.html https://github.com/wonjoonSeol-WS/dice-roguelife/releases/latest/download/dice-roguelife.html
+curl -L -o dice-roguelife.html https://github.com/wonjoonSeol/dice-roguelife/releases/latest/download/dice-roguelife.html
 받은 파일이 수백 KB짜리 HTML인지 확인한 다음, 새 아티팩트를 만들지 말고 아래 내 아티팩트 링크에 덮어써 줘.
 기능은 db, sample, user, assets, downloads, artifact로 맞춰 줘.
 내 아티팩트: (여기에 내 아티팩트 링크)
@@ -71,7 +71,7 @@ curl -L -o dice-roguelife.html https://github.com/wonjoonSeol-WS/dice-roguelife/
 
 ```
 컴퓨터 도구(bash)에서 아래 명령으로 파일을 받아 줘. 웹 읽기(web fetch)는 쓰지 마. GitHub가 막아서 실패해.
-curl -L -o dice-roguelife.html https://github.com/wonjoonSeol-WS/dice-roguelife/releases/latest/download/dice-roguelife.html
+curl -L -o dice-roguelife.html https://github.com/wonjoonSeol/dice-roguelife/releases/latest/download/dice-roguelife.html
 받은 파일이 수백 KB짜리 HTML인지(오류 문구가 아닌지) 확인한 다음,
 db, sample, user, assets, downloads, artifact 기능을 켜서 그대로 내 아티팩트로 게시해 줘.
 ```
@@ -217,7 +217,7 @@ npm run release -- 2.2.0   # 버전 올리기, 검사, 테스트, 패키지
 ## 선택: 독립 실행판 (개발자용)
 
 플레이는 아티팩트로 하는 게 기본이에요. API 키나 로컬 모델(Ollama, LM Studio 등)로 내 컴퓨터에서 돌리고 싶은 분을 위해
-커뮤니티가 관리하는 애드온이 [standalone/](standalone/README.md)에 있어요: [최신 릴리스](https://github.com/wonjoonSeol-WS/dice-roguelife/releases/latest)에서
+커뮤니티가 관리하는 애드온이 [standalone/](standalone/README.md)에 있어요: [최신 릴리스](https://github.com/wonjoonSeol/dice-roguelife/releases/latest)에서
 `dice-roguelife-standalone-v….zip`을 받아 압축을 풀고 `npm start`(Node.js 22.13 이상, 따로 설치할 것 없음). 아티팩트와는
 별도 파일이고(아티팩트 페이지는 그대로 `dice-roguelife.html`), 아티팩트 빌드에는 들어가지 않아요. 폰에서도 하고 싶다면 Tailscale로 내 컴퓨터에 접속하면 돼요(그 README 참고).
 
@@ -227,4 +227,4 @@ npm run release -- 2.2.0   # 버전 올리기, 검사, 테스트, 패키지
 
 ## 다른 프로젝트도 써 보세요
 
-마음에 드셨다면 제가 만든 다른 오픈소스도 둘러보세요. 안드로이드 앱, Claude 채팅 게임, Claude 애드온 등이 있어요: [wonjoonseol-ws.github.io](https://wonjoonseol-ws.github.io/ko/?from=dice-roguelife)
+마음에 드셨다면 제가 만든 다른 오픈소스도 둘러보세요. 안드로이드 앱, Claude 채팅 게임, Claude 애드온 등이 있어요: [wonjoonseol.github.io](https://wonjoonseol.github.io/ko/?from=dice-roguelife)

@@ -3,14 +3,14 @@
 # ダイスが決める人生 (Dice Roguelife) - ローグライクAIチャットゲーム
 
 > ## 📖 ガイド
-> **日本語: https://wonjoonseol-ws.github.io/dice-roguelife/?lang=ja** · **English: https://wonjoonseol-ws.github.io/dice-roguelife/** · **한국어: https://wonjoonseol-ws.github.io/dice-roguelife/?lang=ko**
+> **日本語: https://wonjoonseol.github.io/dice-roguelife/?lang=ja** · **English: https://wonjoonseol.github.io/dice-roguelife/** · **한국어: https://wonjoonseol.github.io/dice-roguelife/?lang=ko**
 > 始め方、ダイスモード、画像の設定をスクリーンショット付きで説明しています。インストールとアップデートの手順はすぐ下にあります。
 
 > ## 🎁 サンプル画像パック（無料素材）
 > すぐに使えるサンプルファイルです：**シャドウ画像6枚**とタグファイル（キャラクター3人・画像9枚、背景4枚）。
-> **[sample-pack.zip をダウンロード](https://github.com/wonjoonSeol-WS/dice-roguelife/releases/download/free-pack-v1/sample-pack.zip)**
+> **[sample-pack.zip をダウンロード](https://github.com/wonjoonSeol/dice-roguelife/releases/download/free-pack-v1/sample-pack.zip)**
 >
-> 無料素材はまだ少ないので、**画像の提供を歓迎しています！** [ガイド](https://wonjoonseol-ws.github.io/dice-roguelife/?lang=ja)の「画像の提供を歓迎します」をご覧ください。
+> 無料素材はまだ少ないので、**画像の提供を歓迎しています！** [ガイド](https://wonjoonseol.github.io/dice-roguelife/?lang=ja)の「画像の提供を歓迎します」をご覧ください。
 
 ダイスが世界、種族、身分、才能を決め、Claudeがその人生をWeb小説のように語るテキストローグライクです。キャラクターの台詞と
 行動を入力すると、結果がどちらにも転びうる場面でd100の判定が振られます。死ぬと回帰し、前世からひとつだけ持ち越して、別の
@@ -47,7 +47,7 @@
 ```
 下のリンクから最新の dice-roguelife.html をダウンロードして、私のアーティファクトとして公開してください。
 db、sample、user、assets、downloads の機能が必要です。
-https://github.com/wonjoonSeol-WS/dice-roguelife/releases/latest/download/dice-roguelife.html
+https://github.com/wonjoonSeol/dice-roguelife/releases/latest/download/dice-roguelife.html
 ```
 
 公開されたリンクを開けばすぐに遊べます。初めて起動するとき、Claudeが**接続の確認**を求めます。ゲームがClaudeを呼び出して物語を書けるように、**OKをタップ**してください。
@@ -60,7 +60,7 @@ https://github.com/wonjoonSeol-WS/dice-roguelife/releases/latest/download/dice-r
 
 ```
 コンピューターツール（bash）で、下のコマンドを使ってファイルをダウンロードしてください。Web取得（web fetch）は使わないでください。
-curl -L -o dice-roguelife.html https://github.com/wonjoonSeol-WS/dice-roguelife/releases/latest/download/dice-roguelife.html
+curl -L -o dice-roguelife.html https://github.com/wonjoonSeol/dice-roguelife/releases/latest/download/dice-roguelife.html
 ファイルが数百KBのHTMLファイルであることを確認してから、新しいアーティファクトは作らずに、下の私のアーティファクトのリンクに上書きしてください。
 機能は db、sample、user、assets、downloads、artifact にしてください。
 私のアーティファクト：（ここに自分のアーティファクトのリンク）
@@ -72,7 +72,7 @@ curl -L -o dice-roguelife.html https://github.com/wonjoonSeol-WS/dice-roguelife/
 
 ```
 コンピューターツール（bash）で、下のコマンドを使ってファイルをダウンロードしてください。Web取得（web fetch）は使わないでください。GitHubにブロックされて失敗します。
-curl -L -o dice-roguelife.html https://github.com/wonjoonSeol-WS/dice-roguelife/releases/latest/download/dice-roguelife.html
+curl -L -o dice-roguelife.html https://github.com/wonjoonSeol/dice-roguelife/releases/latest/download/dice-roguelife.html
 ファイルが数百KBのHTMLファイル（エラーメッセージではない）であることを確認してから、
 db、sample、user、assets、downloads、artifact の機能をオンにして、そのまま私のアーティファクトとして公開してください。
 ```
@@ -218,7 +218,7 @@ npm run release -- 2.5.0   # バージョンを上げて、検査、テスト、
 ## オプション：スタンドアロン版（開発者向け）
 
 遊ぶのはアーティファクトが基本です。API キーやローカルモデル（Ollama、LM Studio など）で自分のコンピューターで動かしたい方向けに、
-コミュニティが管理するアドオンが [standalone/](standalone/README.md) にあります：[最新リリース](https://github.com/wonjoonSeol-WS/dice-roguelife/releases/latest)から
+コミュニティが管理するアドオンが [standalone/](standalone/README.md) にあります：[最新リリース](https://github.com/wonjoonSeol/dice-roguelife/releases/latest)から
 `dice-roguelife-standalone-v….zip` をダウンロードして展開し、`npm start`（Node.js 22.13 以降、インストール不要）。アーティファクトとは
 別ファイルで（アーティファクトのページは `dice-roguelife.html` のまま）、アーティファクトのビルドには含まれません。スマホでも遊びたい場合は、Tailscale で自分のコンピューターに接続できます（その README を参照）。
 
@@ -228,4 +228,4 @@ npm run release -- 2.5.0   # バージョンを上げて、検査、テスト、
 
 ## ほかのプロジェクトもどうぞ
 
-気に入ったら、ほかのオープンソースもぜひ見てください。Androidアプリ、Claudeのチャットゲーム、Claudeのアドオンなどがあります：[wonjoonseol-ws.github.io](https://wonjoonseol-ws.github.io/?from=dice-roguelife)
+気に入ったら、ほかのオープンソースもぜひ見てください。Androidアプリ、Claudeのチャットゲーム、Claudeのアドオンなどがあります：[wonjoonseol.github.io](https://wonjoonseol.github.io/?from=dice-roguelife)

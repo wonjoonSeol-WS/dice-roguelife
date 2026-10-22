@@ -1,6 +1,6 @@
 # Dice Roguelife standalone (optional add-on)
 
-> **The main way to play is the Claude artifact** (see the [README](https://github.com/wonjoonSeol-WS/dice-roguelife#readme)): no install, no API key.
+> **The main way to play is the Claude artifact** (see the [README](https://github.com/wonjoonSeol/dice-roguelife#readme)): no install, no API key.
 > This add-on is for people who would rather run the game on their own computer with an API key or a local model.
 > It is **community-maintained**, and the provider presets are not tested against every paid service.
 
@@ -11,7 +11,7 @@
 
 ## Start
 
-Download `dice-roguelife-standalone-v….zip` from the [latest release](https://github.com/wonjoonSeol-WS/dice-roguelife/releases/latest) (not `dice-roguelife.html`, which is
+Download `dice-roguelife-standalone-v….zip` from the [latest release](https://github.com/wonjoonSeol/dice-roguelife/releases/latest) (not `dice-roguelife.html`, which is
 the artifact page) and unzip it. In the unzipped folder (the one with `package.json`), run:
 
 ```sh

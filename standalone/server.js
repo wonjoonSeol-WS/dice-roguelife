@@ -54,8 +54,8 @@ export function adoptOldData(home = appHome(), from = HERE) {
   return copied;
 }
 
-const REPO = 'https://github.com/wonjoonSeol-WS/dice-roguelife';
-const LATEST = 'https://api.github.com/repos/wonjoonSeol-WS/dice-roguelife/releases/latest';
+const REPO = 'https://github.com/wonjoonSeol/dice-roguelife';
+const LATEST = 'https://api.github.com/repos/wonjoonSeol/dice-roguelife/releases/latest';
 const VERSION = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')).version;
 // the newest release next to this version: { latest, newer, url } with url its standalone zip; latest stays null when
 // GitHub can't be reached (offline, rate-limited), which is no error. Links are built here, never taken from the reply.
