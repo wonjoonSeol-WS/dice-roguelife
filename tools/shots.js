@@ -2,7 +2,8 @@
 //   node tools/shots.js en              every shot
 //   node tools/shots.js ja play extra   some groups (new, play, misc, desk, images, styles, promo, hero, pc, extra)
 // The story in the shots is fake (tools/shots/<lang>.json) and the faces are drawn placeholders. The image-tab shots
-// can show real art instead: DR_SHOT_ART=<folder> with <id>.webp files named as in ART below.
+// can show real art instead: DR_SHOT_ART=<folder> with <id>.webp files named as in ART below, or named by image id
+// (female1_smile.webp, bg_castle-gate_day.webp); with it the play shots show real art too.
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -94,6 +95,9 @@ const HERO_ROWS = [
   { id: 'hunter1_smirk', kind: 'char', name: 'hunter1_smirk', set: 'hunter1', emotion: 'smirk', tags: ['hunter'] },
   { id: 'bg_gate-portal_night', kind: 'scene', name: 'gate-portal_night', tags: ['gate', 'city', 'night'] },
 ];
+// with real art, the play shot shows one story illustration as the scene picture (bg_city-night_cg), as players do
+const CG_ROW = { id: 'bg_city-night_cg', kind: 'scene', name: 'city-night_cg', tags: ['city', 'night'] };
+PICS[CG_ROW.id] = scene(0.6);
 PICS.hunter1_smirk = face(0.9, 'smile');
 PICS['bg_gate-portal_night'] = scene(0.7);
 const SETS = {
@@ -129,9 +133,12 @@ const ART = {
 const ART_DIR = process.env.DR_SHOT_ART;
 const REAL = {};
 if (ART_DIR)
-  for (const [id, file] of Object.entries(ART)) {
-    const p = join(ART_DIR, file + '.webp');
-    if (existsSync(p)) REAL[id] = 'data:image/webp;base64,' + readFileSync(p).toString('base64');
+  for (const id of new Set([...Object.keys(ART), ...Object.keys(PICS)])) {
+    const p = [id, ART[id]]
+      .filter(Boolean)
+      .map(n => join(ART_DIR, n + '.webp'))
+      .find(existsSync);
+    if (p) REAL[id] = 'data:image/webp;base64,' + readFileSync(p).toString('base64');
   }
 
 // the narrator: replies[window.__scn] (the next reply is picked before each send), over an empty reply
@@ -257,14 +264,22 @@ const fate = async (pg, name) => {
 };
 // the opening scene with a background and a face, as the narrator would have placed them
 async function openScene(pg) {
-  await seedImages(pg);
+  await seedImages(pg, true);
+  // real art: a single story illustration as the scene picture; otherwise a background and a portrait
+  const cg = REAL['bg_city-night_cg'];
   await say(pg, S.inputs.look, 'open', 1500);
-  await pg.evaluate(async friend => {
-    const t = DR.app.turns.at(-1);
-    t.img = { scene: 'bg_alley_day', char: 'female1_smile', chars: [{ id: 'female1_smile', npc: friend }] };
-    await DR.turnStore.update(t);
-    DR.renderLog('keep');
-  }, S.replies.open.memory.relations[2].name);
+  await pg.evaluate(
+    async ([friend, cg]) => {
+      if (cg && !DR.app.images.some(x => x.id === cg.id)) DR.app.images.push(cg);
+      const t = DR.app.turns.at(-1);
+      t.img = cg
+        ? { scene: cg.id }
+        : { scene: 'bg_alley_day', char: 'female1_smile', chars: [{ id: 'female1_smile', npc: friend }] };
+      await DR.turnStore.update(t);
+      DR.renderLog('keep');
+    },
+    [S.replies.open.memory.relations[2].name, cg && CG_ROW],
+  );
   await wait(pg, 700);
 }
 
@@ -289,7 +304,9 @@ const GROUPS = {
     await begin(pg, { fateShot: 'fate' });
     await openScene(pg);
     await pg.evaluate(() => {
-      const i = [...document.querySelectorAll('#log img.char')].pop();
+      // start at the scene picture so the background and the face are both in the shot
+      const i =
+        [...document.querySelectorAll('#log .scene')].pop() || [...document.querySelectorAll('#log img.char')].pop();
       if (i) i.scrollIntoView({ block: 'start' });
       document.querySelector('#log').scrollTop -= 30;
     });
