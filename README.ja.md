@@ -225,3 +225,7 @@ npm run release -- 2.5.0   # バージョンを上げて、検査、テスト、
 ## ライセンス
 
 [MIT](LICENSE)
+
+## ほかのプロジェクトもどうぞ
+
+気に入ったら、ほかのオープンソースもぜひ見てください。Androidアプリ、Claudeのチャットゲーム、Claudeのアドオンなどがあります：[wonjoonseol-ws.github.io](https://wonjoonseol-ws.github.io/?from=dice-roguelife)
